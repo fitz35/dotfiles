@@ -8,9 +8,11 @@
       url = "github:nix-community/home-manager/release-23.11";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    my_personnal_script.url = "github:fitz35/my_personnal_script";
   };
 
-  outputs = { nixpkgs, home-manager, ... }:
+  outputs = { nixpkgs, home-manager, ... }@ inputs:
     let
       system = "x86_64-linux";
       pkgs = nixpkgs.legacyPackages.${system};
@@ -22,6 +24,7 @@
         # the path to your home.nix.
         extraSpecialArgs = { inherit pkgs perso_config; };
         modules = [
+          { _module.args.inputs = inputs; }
           ./home.nix
         ];
 
