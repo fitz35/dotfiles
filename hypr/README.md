@@ -1,0 +1,1 @@
+This is hyprland config files. Normally all will be in the home manager.

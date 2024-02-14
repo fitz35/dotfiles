@@ -1,0 +1,11 @@
+Host *github.com
+	User fitz35
+	IdentityFile ~/.ssh/github_ssh_key
+
+Host *gitlab.inria.fr
+	User clahoche
+	IdentityFile ~/.ssh/gitlab_pc_port_2
+
+Host *tatooine.irisa.fr
+    User clahoche
+    IdentityFile ~/.ssh/gitlab_pc_port_2
