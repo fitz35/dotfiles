@@ -2,7 +2,7 @@
 
 
 
-i3_config_folder="$1/.config/i3"
+i3_config_folder="$1.config/i3"
 
 mkdir -p "$i3_config_folder"
 

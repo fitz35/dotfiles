@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-openvpn_config_folder="$1/.config/openvpn"
+openvpn_config_folder="$1.config/openvpn"
 
 
 mkdir -p "$openvpn_config_folder"

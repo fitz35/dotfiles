@@ -21,6 +21,10 @@ if [ ! -d "$home_directory/.config" ]; then
     exit 1
 fi
 
+if [[ $home_directory != */ ]]; then
+    home_directory="$home_directory/"
+fi
+
 # ------------------ fonts ------------------
 echo "Installing fonts..."
 # Check if the fonts folder exists
@@ -98,3 +102,7 @@ sh ./polybar_config.sh $home_directory
 # openvpn
 echo "cp openvpn configuration files..."
 sh ./openvpn_config.sh $home_directory
+
+# home manager
+echo "cp home manager configuration files..."
+sh ./home_manager_config.sh $home_directory

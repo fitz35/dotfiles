@@ -1,9 +1,4 @@
-{ config, pkgs, ... }:
-
-
-let 
-  config = import ./config_nix.nix;
-in
+{config, perso_config, pkgs, ... }:
 {
   # Home Manager needs a bit of information about you and the
   # paths it should manage.

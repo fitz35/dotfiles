@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 
-polybar_config_folder="$1/.config/polybar"
+polybar_config_folder="$1.config/polybar"
 
 rm -rf -- "$polybar_config_folder"
 
