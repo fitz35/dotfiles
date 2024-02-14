@@ -7,5 +7,4 @@
   WINDOWS_PARTITION = "/dev/nvme0n1p2"; # optionnal
 
   DISK_ENCRYPTION = false;
-  BUILT_IN_MONITOR = "eDP-1"; # optionnal
 }

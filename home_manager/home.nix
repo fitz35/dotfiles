@@ -1,9 +1,9 @@
-{config, perso_config, pkgs, ... }:
+{pkgs, perso_config, ... }:
 {
   # Home Manager needs a bit of information about you and the
   # paths it should manage.
-  home.username = "${config.USER_NAME}";
-  home.homeDirectory = "/home/${config.USER_NAME}";
+  home.username = "${perso_config.USER_NAME}";
+  home.homeDirectory = "/home/${perso_config.USER_NAME}";
 
   # ------------------ Bash ------------------
   programs.bash = {
@@ -37,7 +37,7 @@
 
     # ............... Monitors ...............
     monitors = [
-      "${config.BUILT_IN_MONITOR},preferred,0x0,1"
+      "${perso_config.BUILT_IN_MONITOR},preferred,0x0,1"
 
 
       # Default
@@ -58,7 +58,7 @@
 
     # ............... inputs ...............
     input = {
-        kb_layout = config.KEYBOARD_LAYOUT;
+        kb_layout = perso_config.KEYBOARD_LAYOUT;
 
         follow_mouse = 1;
 
