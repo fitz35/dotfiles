@@ -100,3 +100,8 @@ The [patch](https://gitlab.gnome.org/GNOME/gnome-shell/-/issues/3877) must be in
 > WARN : This doesn't work, apply the patch directly
 
 [Here](https://discourse.nixos.org/t/unable-to-change-background-in-gdm/33563/4) is the steps to apply the patch directly.
+
+
+# Xsession
+
+The description can be found [here](https://gist.github.com/bennofs/bb41b17deeeb49e345904f2339222625).

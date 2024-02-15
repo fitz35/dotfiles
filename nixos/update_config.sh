@@ -6,6 +6,10 @@ sudo cp -r $BACKGROUND_PATH /etc/nixos/
 IMG=$(ls /etc/nixos/login_images/ | shuf -n 1)
 sudo cp "/etc/nixos/login_images/$IMG" "/etc/nixos/"
 
+# xmonad
+sudo rm /etc/nixos/xmonad.hs
+sudo cp ./xmonad.hs /etc/nixos/xmonad.hs
+
 # flake
 sudo rm /etc/nixos/flake.nix
 sudo cp ./flake.nix /etc/nixos/flake.nix

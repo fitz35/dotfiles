@@ -2,7 +2,7 @@
 # your system.  Help is available in the configuration.nix(5) man page
 # and in the NixOS manual (accessible by running `nixos-help`).
 
-{ config, lib, pkgs, inputs, ... }:
+{ config, lib, pkgs, inputs, options, ... }:
 
 let
   # efi mount point :
@@ -114,10 +114,10 @@ in
   # ------------------------------------------
 
   # Hyprland
-  programs.hyprland = {
-    enable = true;
-    xwayland.enable = true;
-  };
+  #programs.hyprland = {
+  #  enable = true;
+  #  xwayland.enable = true;
+  #};
   # Optional, hint electron apps to use wayland:
   environment.sessionVariables.NIXOS_OZONE_WL = "1";
 
@@ -135,10 +135,12 @@ in
       gnome.enable = true; # enable gnome
     };
 
-    displayManager.defaultSession = "myI3";
+    # ------------------------------ SESSIONS ------------------------------
+
+    displayManager.defaultSession = "none+myI3";
     displayManager.session = [
       {
-        manage = "desktop";
+        manage = "window";
         name = "myI3";
         # start i3 in debug mode
         #start = ''sh /home/${config.USER_NAME}/.config/i3/generate_i3_config.sh & exec i3 --shmlog-size=26214400'';
@@ -146,7 +148,11 @@ in
         start = ''sh /home/${config.USER_NAME}/.config/i3/generate_i3_config.sh & exec i3'';
       }
     ];
-
+    windowManager.xmonad = {
+      enable = true;
+      enableContribAndExtras = true;
+      config = builtins.readFile ./xmonad.hs;
+    };
     windowManager.i3 = {
       enable = true;
 
@@ -178,6 +184,9 @@ in
         python3
       ];
     };
+
+
+    # ------------------------------ DISPLAY MANAGER ------------------------------
     displayManager.gdm = {
       enable = true;
       wayland = true;
