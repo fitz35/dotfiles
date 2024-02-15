@@ -339,6 +339,8 @@ in
       openvpn
 
       my_script
+
+      obsidian # note taking
     ];
   };
 
@@ -362,6 +364,12 @@ in
   };
   # List packages installed in system profile. To search, run:
   # $ nix search wget
+
+  nixpkgs.config.permittedInsecurePackages = [
+    "electron-25.9.0" # obsidian dependency
+  ];
+ 
+
   environment.systemPackages = with pkgs; [
     gnome.gnome-tweaks
     # stable packages here

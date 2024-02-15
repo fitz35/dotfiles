@@ -264,6 +264,7 @@ bindsym --whole-window $mod+shift+Tab workspace prev_on_output
 # then click on the window
 assign [class="Thunderbird"] $ws1
 assign [class="(?i)firefox"] $ws2
+assign [class="obsidian"] $ws4
 assign [class="discord"] $ws5
 assign [class="stacer"] $ws10
 assign [class="Spotify"] $ws11
@@ -272,7 +273,7 @@ assign [class="Spotify"] $ws11
 # when the window is load)
 # exclude pop up by title
 for_window [class="(?i)code" title=".* - Visual Studio Code"] move container to workspace $ws3
-for_window [class="(?i)code" title=".*notes - Visual Studio Code"] move container to workspace $ws4
+for_window [class="obsidian" title=".*notes*."] move container to workspace $ws4
 for_window [class="(?i)code" title=".*dotfiles - Visual Studio Code"] move container to workspace $ws9
 # reload the configuration file
 bindsym $mod+Shift+c exec "sh $HOME/.config/i3/generate_i3_config.sh ; i3-msg reload"
@@ -338,7 +339,7 @@ exec --no-startup-id flameshot
 # NOTE : discord must in first, else it will swallow the firefox window for 
 # whatever reason
 exec i3-msg "workspace $ws5; exec discord"
-exec i3-msg "workspace $ws4; exec code ~/Documents/github/perso-divers/notes"
+exec i3-msg "workspace $ws4; exec obsidian ~/Documents/github/perso-divers/notes"
 exec i3-msg "workspace $ws9; exec code ~/Documents/github/dotfiles/"
 exec i3-msg "workspace $ws10; exec stacer"
 exec i3-msg "workspace $ws11; exec spotify"

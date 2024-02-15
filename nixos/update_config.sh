@@ -6,10 +6,6 @@ sudo cp -r $BACKGROUND_PATH /etc/nixos/
 IMG=$(ls /etc/nixos/login_images/ | shuf -n 1)
 sudo cp "/etc/nixos/login_images/$IMG" "/etc/nixos/"
 
-# home manager
-sudo rm /etc/nixos/home.nix
-sudo cp ./home.nix /etc/nixos/home.nix
-
 # flake
 sudo rm /etc/nixos/flake.nix
 sudo cp ./flake.nix /etc/nixos/flake.nix
