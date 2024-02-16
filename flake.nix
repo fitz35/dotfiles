@@ -4,10 +4,7 @@
   inputs = {
     nixpkgs.url = "nixpkgs/nixos-23.11";
 
-    flake-utils = {
-      url = "github:numtide/flake-utils";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
+    flake-utils.url = "github:numtide/flake-utils";
   };
 
   outputs = { flake-utils, nixpkgs, self }:
@@ -30,6 +27,9 @@
             haskell-language-server # https://github.com/haskell/haskell-language-server
             hlint                   # https://github.com/ndmitchell/hlint
             ormolu                  # https://github.com/tweag/ormolu
+            xmonad
+            xmonad-contrib
+            xmobar
           ];
 
           withHoogle = true;

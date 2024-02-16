@@ -151,7 +151,12 @@ in
     windowManager.xmonad = {
       enable = true;
       enableContribAndExtras = true;
-      config = builtins.readFile ./xmonad.hs;
+      #config = builtins.readFile ./xmonad.hs;
+      extraPackages = haskellPackges: [
+        haskellPackges.xmonad-contrib
+        haskellPackges.xmonad-extras
+        haskellPackges.xmonad
+      ];
     };
     windowManager.i3 = {
       enable = true;

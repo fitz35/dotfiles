@@ -6,6 +6,7 @@ import XMonad.Hooks.ManageHelpers
 import XMonad.Hooks.StatusBar
 import XMonad.Hooks.StatusBar.PP
 
+
 import XMonad.Util.EZConfig
 import XMonad.Util.Loggers
 import XMonad.Util.Ungrab
@@ -16,12 +17,21 @@ import XMonad.Layout.ThreeColumns
 import XMonad.Hooks.EwmhDesktops
 
 
+import Control.Monad (when)
+import Text.Printf (printf)
+import System.Posix.Process (executeFile)
+import System.Info (arch,os)
+import System.Environment (getArgs)
+import System.FilePath ((</>))
+
 main :: IO ()
-main = xmonad
+main =  xmonad
      . ewmhFullscreen
      . ewmh
      . withEasySB (statusBarProp "xmobar" (pure myXmobarPP)) defToggleStrutsKey
      $ myConfig
+
+--main = getDirectories >>= launch myConfig
 
 myConfig = def
     { modMask    = mod4Mask      -- Rebind Mod to the Super key
@@ -75,3 +85,15 @@ myXmobarPP = def
     yellow   = xmobarColor "#f1fa8c" ""
     red      = xmobarColor "#ff5555" ""
     lowWhite = xmobarColor "#bbbbbb" ""
+
+compiledConfig = printf "xmonad-%s-%s" arch os
+
+compileRestart resume = do
+    dirs  <- asks directories
+    whenX (recompile dirs True) $ do
+      when resume writeStateToFile
+      catchIO
+          ( do
+              args <- getArgs
+              executeFile (cacheDir dirs </> compiledConfig) False args Nothing
+          )
