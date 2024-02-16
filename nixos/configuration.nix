@@ -133,11 +133,16 @@ in
     desktopManager = {
       xterm.enable = false;
       gnome.enable = true; # enable gnome
+      xfce = { # enable xfce
+        enable = true;
+        noDesktop = true; # disable xfce desktop, use i3 instead
+        enableXfwm = false;
+      };
     };
 
     # ------------------------------ SESSIONS ------------------------------
 
-    displayManager.defaultSession = "none+myI3";
+    displayManager.defaultSession = "xfce+myI3";
     displayManager.session = [
       {
         manage = "window";
@@ -148,16 +153,7 @@ in
         start = ''sh /home/${config.USER_NAME}/.config/i3/generate_i3_config.sh & exec i3'';
       }
     ];
-    windowManager.xmonad = {
-      enable = true;
-      enableContribAndExtras = true;
-      #config = builtins.readFile ./xmonad.hs;
-      extraPackages = haskellPackges: [
-        haskellPackges.xmonad-contrib
-        haskellPackges.xmonad-extras
-        haskellPackges.xmonad
-      ];
-    };
+    
     windowManager.i3 = {
       enable = true;
 
@@ -455,6 +451,9 @@ in
   # autorandr (screen management)
   services.autorandr.enable = true;
   
+  # Enable polkit (https://nixos.wiki/wiki/Polkit) to use sway
+  security.polkit.enable = true;
+
   # Open ports in the firewall.
   # networking.firewall.allowedTCPPorts = [ ... ];
   # networking.firewall.allowedUDPPorts = [ ... ];

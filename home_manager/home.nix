@@ -22,7 +22,6 @@ in
     # ! WARNING ! # Use this wisely, prefer using configuration.nix. Can be used for hyprland and display configuration
     my_script
   ];
-
   # This value determines the Home Manager release that your
   # configuration is compatible with. This helps avoid breakage
   # when a new Home Manager release introduces backwards

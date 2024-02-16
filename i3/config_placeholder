@@ -250,7 +250,7 @@ bindsym $mod+Shift+F10 move container to workspace number $ws20
 bindsym $mod+Mod1+1 move workspace to output $screen_2
 bindsym $mod+Mod1+eacute move workspace to output $screen_1
 bindsym $mod+Mod1+3 move workspace to output $screen_3
-
+bindsym $mod+Mod1+4 move workspace to output next
 
 
 # rolling :
