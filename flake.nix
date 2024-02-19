@@ -1,39 +1,62 @@
 {
-  description = "Simple haskell nix flake";
+  description = "Luarocks flake";
 
   inputs = {
-    nixpkgs.url = "nixpkgs/nixos-23.11";
-
     flake-utils.url = "github:numtide/flake-utils";
+    nixpkgs.url = "github:nixos/nixpkgs";
+
+    flake-compat = {
+      url = "github:edolstra/flake-compat";
+      flake = false;
+    };
   };
 
-  outputs = { flake-utils, nixpkgs, self }:
-    flake-utils.lib.eachDefaultSystem (system:
+  outputs = { self, nixpkgs, flake-utils, ... }:
+    flake-utils.lib.eachSystem [ "x86_64-linux" ] (system:
       let
-        config = {};
-        overlays = [];
-        pkgs = import nixpkgs { inherit config overlays system; };
-      in rec {
-        devShell = pkgs.haskellPackages.shellFor {
-          packages = p: [
-          ];
+        pkgs = nixpkgs.legacyPackages.${system};
+        luaInterpreters = with pkgs; [
+          lua5_1
+          lua5_2
+          lua5_3
+          lua5_4
+        ];
 
-          buildInputs = with pkgs.haskellPackages; [
-            cabal-install
+        mkPackage = luaInterpreter:
+          luaInterpreter.pkgs.luarocks-nix.overrideAttrs (old: {
+            version = "dev";
+            src = self;
+          });
 
-            # Helpful tools for `nix develop` shells
-            #
-            ghcid                   # https://github.com/ndmitchell/ghcid
-            haskell-language-server # https://github.com/haskell/haskell-language-server
-            hlint                   # https://github.com/ndmitchell/hlint
-            ormolu                  # https://github.com/tweag/ormolu
-            xmonad
-            xmonad-contrib
-            xmobar
-          ];
+        mkDevShell = luaInterpreter:
+          luaInterpreter.pkgs.luarocks.overrideAttrs (oa: {
+            name = "luarocks-dev";
+            buildInputs = oa.buildInputs ++ [
+              # TODO restore
+              pkgs.sumneko-lua-language-server
+              pkgs.lua51Packages.luacheck
+            ];
+          });
 
-          withHoogle = true;
-        };
-      }
-    );
+      in
+      {
+
+        packages = {
+          default = self.packages.${system}."luarocks-51";
+        } // (nixpkgs.lib.listToAttrs (builtins.map
+          (luaInterpreter:
+            let
+              versions = nixpkgs.lib.splitVersion luaInterpreter.luaversion;
+              pkgName = "luarocks-${builtins.elemAt versions 0}${builtins.elemAt versions 1}";
+            in
+            nixpkgs.lib.nameValuePair pkgName (mkPackage luaInterpreter)
+          )
+          luaInterpreters));
+
+        # devShells = {
+        #   default = self.devShells.${system}.luarocks-51;
+        #   } // (nixpkgs.lib.listToAttrs (builtins.map (luaInterpreter:
+        #     nixpkgs.lib.nameValuePair "luarocks-${luaInterpreter.version}" (mkDevShell luaInterpreter)
+        #   luaInterpreters)));
+      });
 }
