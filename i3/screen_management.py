@@ -144,3 +144,5 @@ if __name__ == '__main__':
     }
     # Write the environment variables
     modify_env_file(I3_ENV, changes)
+    for key, value in changes:
+        print(f"{key}={value}")

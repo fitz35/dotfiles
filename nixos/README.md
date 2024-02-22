@@ -105,3 +105,10 @@ The [patch](https://gitlab.gnome.org/GNOME/gnome-shell/-/issues/3877) must be in
 # Xsession
 
 The description can be found [here](https://gist.github.com/bennofs/bb41b17deeeb49e345904f2339222625).
+
+# clean OS
+
+```shell
+sudo nix-env --delete-generations 2d
+sudo nix-collect-garbage -d
+```
