@@ -276,9 +276,9 @@ for_window [class="(?i)code" title=".* - Visual Studio Code"] move container to 
 for_window [class="obsidian" title=".*notes*."] move container to workspace $ws4
 for_window [class="(?i)code" title=".*dotfiles - Visual Studio Code"] move container to workspace $ws9
 # reload the configuration file
-bindsym $mod+Shift+c exec "sh $HOME/.config/i3/generate_i3_config.sh ; i3-msg reload"
+bindsym $mod+Shift+c exec "sh $HOME/.config/i3/generate_i3_config.sh; i3-msg reload"
 # restart i3 inplace (preserves your layout/session, can be used to upgrade i3)
-bindsym $mod+Shift+r exec "sh $HOME/.config/i3/generate_i3_config.sh ; i3-msg restart"
+bindsym $mod+Shift+r exec "sh $HOME/.config/i3/generate_i3_config.sh; i3-msg restart"
 # exit i3 (logs you out of your X session)
 bindsym $mod+Shift+e exec "i3-nagbar -t warning -m 'You pressed the exit shortcut. Do you really want to exit i3? This will end your X session.' -B 'Yes, exit i3' 'i3-msg exit'"
 # open the connection applet

@@ -1,4 +1,5 @@
 # Equivalent of DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+import argparse
 from dataclasses import dataclass, field
 import json
 import os
@@ -110,8 +111,16 @@ def modify_env_file(env_file_path: str, changes: Dict[str, str]) -> None:
     # Write the changes back to the .env file
     with open(env_file_path, 'w') as file:
         file.writelines(lines)
+        
+def get_argv_parser():
+    parser = argparse.ArgumentParser(description='Detect and apply the screen configuration with autorandr and xrandr.')
+    parser.add_argument('-e', '--env', action='store_true', help="store the environment variables in the i3.env file")
+    return parser
 
 if __name__ == '__main__':
+    parser = get_argv_parser()
+    args = parser.parse_args()
+
     popen = os.popen('autorandr --change').read()
     profiles = AutoXrandrOutputs.create_from_autorandr_output()
     profile_config = create_from_json(json.load(open(SCREEN_CONFIG)))
@@ -143,6 +152,7 @@ if __name__ == '__main__':
         'SCREEN_3': screen3_port,
     }
     # Write the environment variables
-    modify_env_file(I3_ENV, changes)
+    if args.env:
+        modify_env_file(I3_ENV, changes)
     for key, value in changes:
         print(f"{key}={value}")

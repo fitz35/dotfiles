@@ -13,7 +13,7 @@ modified_config_path="${i3_config_folder}/config"
 screen_script_path="${i3_config_folder}/screen_management.py"
 
 # run the screen management script (after the autorandr service has been started)
-python3 "$screen_script_path"
+python3 "$screen_script_path" -e
 cp "$original_config_path" "$modified_config_path"
 
 source "$i3_config_folder/i3.env"
