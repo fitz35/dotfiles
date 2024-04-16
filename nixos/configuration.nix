@@ -9,8 +9,6 @@ let
   EFI_MOUNTPOINT = "/boot/efi";
   # windows mount point :
   WINDOWS_MOUNTPOINT = "/mnt/windows";
-  # default browser :
-  DEFAULT_BROWSER = "firefox";
 
   # my_script
   my_script = inputs.my_personnal_script.packages.x86_64-linux.default;
@@ -363,20 +361,6 @@ in
     ];
   };
 
-  # Make the default browser the default application for the following mime types.
-  xdg.mime = {
-    enable = true;
-    defaultApplications = {
-      # pdf
-      "application/pdf" = "okular.desktop";
-      # web link
-      "text/html" = "${DEFAULT_BROWSER}.desktop";
-      "x-scheme-handler/http" = "${DEFAULT_BROWSER}.desktop";
-      "x-scheme-handler/https" = "${DEFAULT_BROWSER}.desktop";
-      "x-scheme-handler/about" = "${DEFAULT_BROWSER}.desktop";
-      "x-scheme-handler/unknown" = "${DEFAULT_BROWSER}.desktop";
-    };
-  };
   users.users."root" = {
     initialHashedPassword = "${USER_HASHED_PASSWORD}";
     hashedPassword = "${USER_HASHED_PASSWORD}";
