@@ -383,6 +383,7 @@ in
     htop
     neofetch
     networkmanagerapplet
+    openconnect # vpn
     openssl
     direnv
     gcc
