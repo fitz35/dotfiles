@@ -333,7 +333,7 @@ in
       tree
       zotero
       discord
-      minecraft
+      #minecraft
       gnome.gnome-terminal
       gnome.nautilus # file manager
       gnome.gnome-tweaks
@@ -358,6 +358,8 @@ in
       my_script
 
       obsidian # note taking
+
+      warp-terminal
     ];
   };
 
