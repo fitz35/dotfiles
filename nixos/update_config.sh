@@ -16,3 +16,5 @@ sudo cp ./configuration.nix /etc/nixos/configuration.nix
 
 #rebuild
 sudo nixos-rebuild switch --show-trace
+
+sudo ln -s /run/current-system/sw/bin/bash /bin/

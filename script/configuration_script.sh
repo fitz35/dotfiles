@@ -104,8 +104,8 @@ echo "cp openvpn configuration files..."
 sh ./openvpn_config.sh $home_directory
 
 # home manager
-echo "cp home manager configuration files..."
-sh ./home_manager_config.sh $home_directory
+#echo "cp home manager configuration files..."
+#sh ./home_manager_config.sh $home_directory
 
 # awesome
 echo "cp awesome configuration files..."

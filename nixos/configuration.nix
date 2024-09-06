@@ -323,9 +323,7 @@ in
     #mkpasswd -m sha-512
     hashedPassword = "${USER_HASHED_PASSWORD}";
 
-    packages = with pkgs; [
-      home-manager
-      
+    packages = with pkgs; [      
       firefox
       chromium
       thunderbird
