@@ -358,6 +358,8 @@ in
       obsidian # note taking
 
       warp-terminal
+
+      xmind
     ];
   };
 
