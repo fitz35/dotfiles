@@ -186,10 +186,10 @@ workspace $ws8 output $screen_1
 workspace $ws9 output $screen_1
 workspace $ws10 output $screen_2 $screen_1
 workspace $ws11 output $screen_2 $screen_1
-workspace $ws12 output $screen_3 $screen_1
-workspace $ws13 output $screen_3 $screen_1
-workspace $ws14 output $screen_3 $screen_1
-workspace $ws15 output $screen_3 $screen_1
+workspace $ws12 output $screen_1
+workspace $ws13 output $screen_1
+workspace $ws14 output $screen_1
+workspace $ws15 output $screen_1
 workspace $ws16 output $screen_3 $screen_1
 workspace $ws17 output $screen_3 $screen_1
 workspace $ws18 output $screen_3 $screen_1
