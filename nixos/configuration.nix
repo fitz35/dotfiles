@@ -140,6 +140,7 @@ in
 
     # ------------------------------ SESSIONS ------------------------------
 
+    #displayManager.defaultSession = "plasma6+i3+whatever";
     displayManager.defaultSession = "xfce+myI3";
     displayManager.session = [
       {
@@ -184,14 +185,14 @@ in
       ];
     };
 
-    windowManager.awesome = {
-      enable = true;
-      luaModules = with pkgs.luaPackages; [
-        luarocks # is the package manager for Lua modules
-        luadbi-mysql # Database abstraction layer
-      ];
+    #windowManager.awesome = {
+    #  enable = true;
+    #  luaModules = with pkgs.luaPackages; [
+    #    luarocks # is the package manager for Lua modules
+    #    luadbi-mysql # Database abstraction layer
+    #  ];
 
-    };
+    #};
 
 
     # ------------------------------ DISPLAY MANAGER ------------------------------
@@ -202,6 +203,10 @@ in
     #videoDrivers = [ "nvidia" ];
     #displayManager.defaultSession = "none+i3";
   };
+
+  # Workaround to fix the ssh-askpass error when using plasma and gnome
+  # https://discourse.nixos.org/t/have-gnome-plasma-at-the-same-time/40991
+  programs.ssh.askPassword = pkgs.lib.mkForce "${pkgs.gnome.seahorse.out}/libexec/seahorse/ssh-askpass"; 
 
   # remove gnome apps
   environment.gnome.excludePackages = (with pkgs; [
