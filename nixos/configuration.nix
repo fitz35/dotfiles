@@ -214,7 +214,6 @@ in
     gnome-tour
     gnome-text-editor
       ]) ++ (with pkgs.gnome; [
-    cheese # webcam tool
     gnome-music
     gnome-terminal
     epiphany # web browser
@@ -365,6 +364,10 @@ in
       warp-terminal
 
       xmind
+
+      texliveFull
+
+      cups # printer
     ];
   };
 
