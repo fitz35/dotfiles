@@ -368,6 +368,7 @@ in
       texliveFull
 
       cups # printer
+      lshw # hardware info
     ];
   };
 
