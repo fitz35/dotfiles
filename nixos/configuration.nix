@@ -335,6 +335,7 @@ in
       tree
       zotero
       discord
+      unzip
       #minecraft
       gnome.gnome-terminal
       gnome.nautilus # file manager
