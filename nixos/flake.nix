@@ -6,7 +6,7 @@
        # WARNING : CAN'T DECLARE REUSABLE VARIABLES HERE
 
       # Official NixOS package source
-      nixpkgs.url = "github:NixOS/nixpkgs/nixos-24.05";
+      nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.11";
       
       # Minecraft grub2 theme
       minegrub-theme.url = "github:0nyr/minegrub-theme"; 

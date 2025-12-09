@@ -121,12 +121,15 @@ in
 
   # Enable the X11 windowing system with i3 as window manager.
   environment.pathsToLink = [ "/libexec" ]; # links /libexec from derivations to /run/current-system/sw 
+  # Enable touchpad support (enabled default in most desktopManager).
+  services.libinput.enable = true;
+  #displayManager.defaultSession = "plasma6+i3+whatever";
+  services.displayManager.defaultSession = "xfce+myI3";
   services.xserver = {
     enable = true;
-    layout = "${config.KEYBOARD_LAYOUT}";
-    xkbOptions = "eurosign:e,caps:escape";
-    # Enable touchpad support (enabled default in most desktopManager).
-    libinput.enable = true;
+    xkb.layout = "${config.KEYBOARD_LAYOUT}";
+    xkb.options = "eurosign:e,caps:escape";
+    
 
     desktopManager = {
       xterm.enable = false;
@@ -140,8 +143,7 @@ in
 
     # ------------------------------ SESSIONS ------------------------------
 
-    #displayManager.defaultSession = "plasma6+i3+whatever";
-    displayManager.defaultSession = "xfce+myI3";
+    
     displayManager.session = [
       {
         manage = "window";
@@ -206,16 +208,15 @@ in
 
   # Workaround to fix the ssh-askpass error when using plasma and gnome
   # https://discourse.nixos.org/t/have-gnome-plasma-at-the-same-time/40991
-  programs.ssh.askPassword = pkgs.lib.mkForce "${pkgs.gnome.seahorse.out}/libexec/seahorse/ssh-askpass"; 
+  programs.ssh.askPassword = pkgs.lib.mkForce "${pkgs.seahorse.out}/libexec/seahorse/ssh-askpass"; 
 
   # remove gnome apps
   environment.gnome.excludePackages = (with pkgs; [
     gnome-photos
     gnome-tour
     gnome-text-editor
-      ]) ++ (with pkgs.gnome; [
+      ]) ++ (with pkgs; [
     gnome-music
-    gnome-terminal
     epiphany # web browser
     geary # email reader
     evince # document viewer
@@ -240,9 +241,9 @@ in
 
   # Fonts
   fonts.packages = with pkgs; [
-    (nerdfonts.override { fonts = [
-      "FiraCode" "JetBrainsMono"
-    ]; })
+    nerd-fonts.fira-code
+    nerd-fonts.jetbrains-mono
+    nerd-fonts.tinos
   ];
 
   # Enable CUPS to print documents.
@@ -251,7 +252,6 @@ in
   # Enable sound with pipewire
   # If alsa doesnt work, make a fresh install of pulseaudio and alsa
   # cf https://discourse.nixos.org/t/cant-get-alsa-nixos-working/644
-  sound.enable = false;
   hardware.pulseaudio.enable = false;
   security.rtkit.enable = true;
   services.pipewire = {
@@ -266,36 +266,32 @@ in
   # login background
 
  nixpkgs = {
-    overlays = [
-      (self: super: {
-        gnome = super.gnome.overrideScope' (selfg: superg: {
-          gnome-shell = superg.gnome-shell.overrideAttrs (old: {
-            patches = (old.patches or []) ++ [
-              (let
-                bg = "/etc/nixos/background.png";
+  overlays = [
+    (self: super: {
+      # Override gnome-shell directly at top-level
+      gnome-shell = super.gnome-shell.overrideAttrs (old: {
+        patches = (old.patches or []) ++ [
+          (let
+            bg = "/etc/nixos/background.png";
+          in super.pkgs.writeText "bg.patch" ''
+            --- a/data/theme/gnome-shell-sass/widgets/_login-lock.scss
+            +++ b/data/theme/gnome-shell-sass/widgets/_login-lock.scss
+            @@ -15,4 +15,8 @@ $_gdm_dialog_width: 23em;
+             /* Login Dialog */
+             .login-dialog {
+               background-color: $_gdm_bg;
+            +  background-image: url('file://${bg}');
+            +  background-size: cover;
+            +  background-repeat: no-repeat;
+            +  background-position: center center;
+             }
+          '')
+        ];
+      });
+    })
+  ];
+};
 
-              # to apply the patch, this line is needed : @@ -15,4 +15,8 @@ $_gdm_dialog_width: 23em;
-              # the 15,4 tell that the patch is applied at line 15, and remove 4 lines (including the line 15)
-              # the 15,8 tell that the patch is applied at line 15, add 8 lines (including the line 15)
-              in pkgs.writeText "bg.patch" ''
-                --- a/data/theme/gnome-shell-sass/widgets/_login-lock.scss
-                +++ b/data/theme/gnome-shell-sass/widgets/_login-lock.scss
-                @@ -15,4 +15,8 @@ $_gdm_dialog_width: 23em;
-                 /* Login Dialog */
-                 .login-dialog {
-                   background-color: $_gdm_bg;
-                +  background-image: url('file://${bg}');
-                +  background-size: cover;
-                +  background-repeat: no-repeat;
-                +  background-position: center center;
-                 }
-              '')
-            ];
-          });
-        });
-      })
-    ];
-  };
 
   # Ensure the script to change the login background runs on user login
   systemd.services.my-login-script = {
@@ -337,16 +333,12 @@ in
       discord
       unzip
       #minecraft
-      gnome.gnome-terminal
-      gnome.nautilus # file manager
-      gnome.gnome-tweaks
-      gnome.evince
+      nautilus # file manager
+      evince
       libreoffice
       spotify
       zoom-us # video conference
       playerctl # media keys
-
-      stacer # system monitor
 
       inkscape # image viewer
 
@@ -354,7 +346,7 @@ in
 
       vlc # video player
 
-      okular # pdf viewer
+      kdePackages.okular# pdf viewer
 
       openvpn
 
@@ -386,7 +378,7 @@ in
  
 
   environment.systemPackages = with pkgs; [
-    gnome.gnome-tweaks
+    gnome-tweaks
     # stable packages here
     vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
     wget
@@ -425,13 +417,8 @@ in
   # List services that you want to enable:
 
   # Enable the OpenSSH daemon.
+  services.gnome.gcr-ssh-agent.enable = false;
   services.openssh.enable = true;
-
-  # don’t shutdown when power button is short-pressed
-  # https://nixos.wiki/wiki/Logind
-  services.logind.extraConfig = ''
-    HandlePowerKey=ignore
-  '';
 
   # clipboard
   services.greenclip.enable = true; 
