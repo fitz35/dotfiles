@@ -92,7 +92,7 @@ in
   i18n.defaultLocale = "en_US.UTF-8";
   # opengl
   hardware.opengl.enable = true;
-  hardware.opengl.extraPackages = [ pkgs.mesa.drivers ];
+  hardware.opengl.extraPackages = [ pkgs.mesa ];
   hardware.opengl.driSupport32Bit = true;
 
   # Configure network proxy if necessary

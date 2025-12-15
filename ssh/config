@@ -1,11 +1,29 @@
-Host *github.com
+Host clahoche@diverci.irisa.fr
+	HostName diverci.irisa.fr
+	User clahoche
+
+Host gitlab2.istic.univ-rennes1.fr
+	User llahoche
+	IdentityFile ~/.ssh/istic_gitlab
+
+
+Host github.com-fitz35
+	HostName github.com
 	User fitz35
 	IdentityFile ~/.ssh/github_ssh_key
+
+Host *github.com
+	User Ort1e
+	IdentityFile ~/.ssh/github_ortie
 
 Host *gitlab.inria.fr
 	User clahoche
 	IdentityFile ~/.ssh/gitlab_pc_port_2
 
+Host *gitlab.softwareheritage.org
+        User Ortie
+        IdentityFile ~/.ssh/swh_gitlab
+
 Host *tatooine.irisa.fr
     User clahoche
-    IdentityFile ~/.ssh/gitlab_pc_port_2
+    IdentityFile ~/.ssh/tatooine_pc_port_inria_2
