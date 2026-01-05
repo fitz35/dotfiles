@@ -4,8 +4,6 @@
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-25.11";
 
-    repo.url = "gitlab:ort1e/swh-repo-mining";
-
     rust-overlay.url = "github:oxalica/rust-overlay";
 
     flake-utils = {

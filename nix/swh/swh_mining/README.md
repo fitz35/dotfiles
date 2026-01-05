@@ -1,7 +1,8 @@
 external flake for swh_mining.
 
-Open a terminal inside the swh mining repo clone and run :
+To use it, put inside .envrc :
 
 ```shell
-nix develop <path-to-this-repo>nix/swh/swh_mining/flake.nix
+use flake <path-to-this-repository>nix/swh/swh_mining
+watch_file <path-to-this-repository>nix/swh/swh_mining/flake.nix
 ```
