@@ -99,23 +99,12 @@ in
   # networking.proxy.default = "http://user:password@proxy:port/";
   # networking.proxy.noProxy = "127.0.0.1,localhost,internal.domain";
 
-  # Select internationalisation properties.
-  # i18n.defaultLocale = "en_US.UTF-8";
-  # console = {
-  #   font = "Lat2-Terminus16";
-  #   keyMap = "us";
-  #   useXkbConfig = true; # use xkbOptions in tty.
-  # };
-
   # ------------------------------------------
   # GUI
   # ------------------------------------------
 
-  # Hyprland
-  #programs.hyprland = {
-  #  enable = true;
-  #  xwayland.enable = true;
-  #};
+  
+
   # Optional, hint electron apps to use wayland:
   environment.sessionVariables.NIXOS_OZONE_WL = "1";
 
@@ -123,38 +112,26 @@ in
   environment.pathsToLink = [ "/libexec" ]; # links /libexec from derivations to /run/current-system/sw 
   # Enable touchpad support (enabled default in most desktopManager).
   services.libinput.enable = true;
-  #displayManager.defaultSession = "plasma6+i3+whatever";
-  services.displayManager.defaultSession = "xfce+myI3";
+
+  services.desktopManager.gnome = {
+    enable = true;
+    flashback.customSessions = [
+      {
+        wmName = "gnome-i3";
+        wmLabel = "Gnome + i3";
+        wmCommand = ''sh /home/${config.USER_NAME}/.config/i3/generate_i3_config.sh & exec i3'';
+        enableGnomePanel = false;
+      }
+    ];
+  };
+
+  # ------------------------------ WINDOW MANAGER ------------------------------
+
   services.xserver = {
     enable = true;
     xkb.layout = "${config.KEYBOARD_LAYOUT}";
     xkb.options = "eurosign:e,caps:escape";
-    
 
-    desktopManager = {
-      xterm.enable = false;
-      gnome.enable = true; # enable gnome
-      xfce = { # enable xfce
-        enable = true;
-        noDesktop = true; # disable xfce desktop, use i3 instead
-        enableXfwm = false;
-      };
-    };
-
-    # ------------------------------ SESSIONS ------------------------------
-
-    
-    displayManager.session = [
-      {
-        manage = "window";
-        name = "myI3";
-        # start i3 in debug mode
-        #start = ''sh /home/${config.USER_NAME}/.config/i3/generate_i3_config.sh & exec i3 --shmlog-size=26214400'';
-        # start i3 in normal mode
-        start = ''sh /home/${config.USER_NAME}/.config/i3/generate_i3_config.sh & exec i3'';
-      }
-    ];
-    
     windowManager.i3 = {
       enable = true;
 
@@ -162,6 +139,7 @@ in
         i3status
         dmenu
         (polybar.override { i3Support = true; pulseSupport = true;})
+        gnome-keyring # password management
         bc
         kitty
         flameshot # screenshot
@@ -186,24 +164,13 @@ in
         python3
       ];
     };
-
-    #windowManager.awesome = {
-    #  enable = true;
-    #  luaModules = with pkgs.luaPackages; [
-    #    luarocks # is the package manager for Lua modules
-    #    luadbi-mysql # Database abstraction layer
-    #  ];
-
-    #};
+  };
 
 
-    # ------------------------------ DISPLAY MANAGER ------------------------------
-    displayManager.gdm = {
+  # ------------------------------ DISPLAY MANAGER ------------------------------
+  services.displayManager.gdm = {
       enable = true;
       wayland = true;
-    };
-    #videoDrivers = [ "nvidia" ];
-    #displayManager.defaultSession = "none+i3";
   };
 
   # Workaround to fix the ssh-askpass error when using plasma and gnome
@@ -328,6 +295,7 @@ in
       chromium
       thunderbird
       vscode
+      zed-editor
       tree
       zotero
       discord
@@ -396,11 +364,42 @@ in
     gparted
     python3 # scripting (add no packages here, use dev shell instead)
     lsof # list open files
+
+    # open xdg utilities (open default app for exemple)
+    xdg-utils
+    xdg-desktop-portal
+    xdg-desktop-portal-gtk
+    xdg-desktop-portal-gnome
+    xdg-launch
   
 
     mesa # opengl
     mesa-demos
-  ];  
+  ];
+
+  # xdg portal setup
+  xdg.portal = {
+    enable = true;
+    extraPortals = [ 
+      pkgs.xdg-desktop-portal-gtk
+      pkgs.xdg-desktop-portal-gnome
+    ];
+    xdgOpenUsePortal = true;
+  };
+
+  xdg.mime.enable = true;
+  xdg.mime.defaultApplications = {
+    "x-scheme-handler/http" = "firefox.desktop";
+    "x-scheme-handler/https" = "firefox.desktop";
+    "x-scheme-handler/mailto" = "thunderbird.desktop";
+    "text/html" = "firefox.desktop";
+    "application/x-extension-htm" = "firefox.desktop";
+    "application/x-extension-html" = "firefox.desktop";
+    "application/x-extension-shtml" = "firefox.desktop";
+    "application/xhtml+xml" = "firefox.desktop";
+    "application/x-extension-xhtml" = "firefox.desktop";
+    "application/x-extension-xht" = "firefox.desktop";
+  };
 
   # ------------------------------------------
   # Services
