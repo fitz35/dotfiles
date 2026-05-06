@@ -330,6 +330,7 @@ in
 
       cups # printer
       lshw # hardware info
+      iotop # list process with high io usage
     ];
   };
 
