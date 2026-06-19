@@ -353,6 +353,7 @@ in
     wget
     gedit
     git
+    git-lfs
     htop
     neofetch
     networkmanagerapplet
