@@ -102,6 +102,18 @@ The [patch](https://gitlab.gnome.org/GNOME/gnome-shell/-/issues/3877) must be in
 [Here](https://discourse.nixos.org/t/unable-to-change-background-in-gdm/33563/4) is the steps to apply the patch directly.
 
 
+# Wifi 802.1X (inria-interne, eduroam)
+
+Since 26.05, `wpa_supplicant` runs sandboxed (`ProtectHome=yes`) and can't read the CA certificates stored in `/home` : the connection fails with `Failed to load root certificates`. The certificates are kept out of this repo, in `/etc/nixos/wifi-certs/` :
+
+```shell
+sudo mkdir -p /etc/nixos/wifi-certs
+sudo cp <inria CA chain>.pem /etc/nixos/wifi-certs/inria-intern.pem
+sudo cp ~/.config/cat_installer/ca.pem /etc/nixos/wifi-certs/eduroam.pem
+nmcli connection modify inria-interne 802-1x.ca-cert /etc/nixos/wifi-certs/inria-intern.pem
+nmcli connection modify eduroam 802-1x.ca-cert /etc/nixos/wifi-certs/eduroam.pem
+```
+
 # Xsession
 
 The description can be found [here](https://gist.github.com/bennofs/bb41b17deeeb49e345904f2339222625).
