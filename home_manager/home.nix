@@ -29,7 +29,7 @@ in
     enable = true;
     associations.added = {
       # pdf
-      "application/pdf" = ["${pkgs.okular}"];
+      "application/pdf" = ["org.kde.okular.desktop"];
       # web link
       "text/html" = ["${DEFAULT_BROWSER}.desktop"];
       "x-scheme-handler/http" = ["${DEFAULT_BROWSER}.desktop"];
@@ -39,7 +39,7 @@ in
     };
     defaultApplications = {
       # pdf
-      "application/pdf" = ["${pkgs.okular}"];
+      "application/pdf" = ["org.kde.okular.desktop"];
       # web link
       "text/html" = ["${DEFAULT_BROWSER}.desktop"];
       "x-scheme-handler/http" = ["${DEFAULT_BROWSER}.desktop"];

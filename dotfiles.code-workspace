@@ -1,0 +1,19 @@
+{
+	// open both repositories together : the dotfiles (nixos, i3, polybar...) and the scripts they call (my_script)
+	"folders": [
+		{
+			"name": "dotfiles",
+			"path": "."
+		},
+		{
+			"name": "my_personnal_script",
+			"path": "../my_personnal_script"
+		}
+	],
+	"settings": {
+		"files.exclude": {
+			"**/.direnv": true,
+			"**/__pycache__": true
+		}
+	}
+}

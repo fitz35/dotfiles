@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env bash
 # This script will configure i3, polybar, and other visuel elements of the system.
 
 # Check if exactly one argument is provided (wich is the home directory ->  can run this script from anywhere)
@@ -8,6 +8,10 @@ if [ $# -ne 1 ]; then
 fi
 
 home_directory="$1"
+
+# repository root (to run this script from anywhere)
+repo_dir="$(cd "$(dirname "$0")/.." && pwd)"
+script_dir="$repo_dir/script"
 
 # Check if the home directory exists
 if [ ! -d $home_directory ]; then
@@ -39,7 +43,7 @@ fonts_name=("CustomJetBrainsMonoNFFantasqueSansMNF-Italic.ttf" "CustomJetBrainsM
 for font in "${fonts_name[@]}"; do
     if [ ! -f "$home_directory/.fonts/$font" ]; then
         echo "Copying $font to $home_directory/.fonts"
-        cp ../fonts/$font "$home_directory/.fonts/$font"
+        cp "$repo_dir/fonts/$font" "$home_directory/.fonts/$font"
     fi
 done
 
@@ -79,34 +83,34 @@ cleaning_and_create_folder $my_script_folder
 echo "Copying the configuration files..."
 # assets
 echo "cp assets..."
-cp -r ../assets/* $assets_folder
+cp -r "$repo_dir"/assets/* $assets_folder
 
 # greenclip
 echo "ln greenclip configuration files..."
-ln ../greenclip/greenclip.toml $greenclip_config_file
-ln ../greenclip/.xinitrc $xinitrc_file
+ln -sf "$repo_dir/greenclip/greenclip.toml" $greenclip_config_file
+ln -sf "$repo_dir/greenclip/.xinitrc" $xinitrc_file
 
 
 # my_script
 echo "ln my_script configuration files..."
-ln ../my_script/config.json $my_script_folder/config.json
+ln -sf "$repo_dir/my_script/config.json" $my_script_folder/config.json
 
 # i3
 echo "cp i3 configuration files..."
-sh ./i3_config.sh $home_directory
+bash "$script_dir/i3_config.sh" $home_directory
 
 # polybar
 echo "cp polybar configuration files..."
-sh ./polybar_config.sh $home_directory
+bash "$script_dir/polybar_config.sh" $home_directory
 
 # openvpn
 echo "cp openvpn configuration files..."
-sh ./openvpn_config.sh $home_directory
+bash "$script_dir/openvpn_config.sh" $home_directory
 
 # home manager
 #echo "cp home manager configuration files..."
-#sh ./home_manager_config.sh $home_directory
+#bash "$script_dir/home_manager_config.sh" $home_directory
 
 # awesome
 echo "cp awesome configuration files..."
-sh ./awesome_config.sh $home_directory
+bash "$script_dir/awesome_config.sh" $home_directory

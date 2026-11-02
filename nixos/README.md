@@ -82,8 +82,8 @@ When installing nixos using the ISO, mount the relewant disk in the `/mnt` file 
 [Here](https://nixos.wiki/wiki/OpenGL), Add to configuration.nix
 
 ```nix
-hardware.opengl.enable = true;
-hardware.opengl.extraPackages = [ pkgs.mesa.drivers ];
+hardware.graphics.enable = true;
+hardware.graphics.extraPackages = [ pkgs.mesa ];
 environment.systemPackages = with pkgs; [
     mesa
 ];

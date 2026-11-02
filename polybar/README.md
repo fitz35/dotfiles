@@ -29,7 +29,7 @@ The script launch regenerate the config.ini replacing the placeholder.
 
 ## Bluetooth
 
-In order to add the bluetooth module, `blueberry` must be installed. Crédit [here](https://github.com/msaitz/polybar-bluetooth).
+In order to add the bluetooth module, `blueman` must be installed (`services.blueman.enable` on nixos). Crédit [here](https://github.com/msaitz/polybar-bluetooth).
 
 ## spotify
 

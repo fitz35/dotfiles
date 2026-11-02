@@ -13,19 +13,17 @@ let
   # my_script
   my_script = inputs.my_personnal_script.packages.x86_64-linux.default;
 
-  # script to generate a background each login (randomly choose an image from /etc/nixos/login_images/)
-   # Define the script using writeShellScript
+  # script to pick a login background at each boot (randomly choose an image from /etc/nixos/login_images/)
   myLoginScript = pkgs.writeShellScript "my-login-script.sh" ''
-    #!/bin/sh
-    # Select a random image from /etc/nixos/login_images/ and copy it to /etc/nixos/
+    # Select a random image from /etc/nixos/login_images/ and copy it to /etc/nixos/background.png
     IMG=$(ls /etc/nixos/login_images/ | shuf -n 1)
     cp "/etc/nixos/login_images/$IMG" "/etc/nixos/background.png"
   '';
   # hashed password
   #mkpasswd -m sha-512
   USER_HASHED_PASSWORD = "$6$bIx/kUybHUmZ.QMQ$VimchBjbSHObo3MdTcmf3rqAax/QdVWzofy8epjnSilKzKUUlMr5fE34q/f903023PQYUsXYwCJ/igeWw8k.y1";
-  # config
-  config = import ./config_nix.nix;
+  # pc relative config (named myConf to not shadow the module "config" argument)
+  myConf = import ./config_nix.nix;
 in
 {
   imports =
@@ -45,7 +43,7 @@ in
       efiInstallAsRemovable = false; # set to true if needed
       device = "nodev";
       useOSProber = true;
-      enableCryptodisk = config.DISK_ENCRYPTION; # LUKs encryption
+      enableCryptodisk = myConf.DISK_ENCRYPTION; # LUKs encryption
       minegrub-theme = {
         enable = true;
         splash = "Lise is watching you !";
@@ -86,14 +84,15 @@ in
 
   # bluetooth
   hardware.bluetooth.enable = true;
+  services.blueman.enable = true; # bluetooth manager (blueberry was removed in 26.05)
 
   # Set your time zone.
   time.timeZone = "Europe/Paris";
   i18n.defaultLocale = "en_US.UTF-8";
-  # opengl
-  hardware.opengl.enable = true;
-  hardware.opengl.extraPackages = [ pkgs.mesa ];
-  hardware.opengl.driSupport32Bit = true;
+  # opengl (hardware.opengl was renamed hardware.graphics in 24.11)
+  hardware.graphics.enable = true;
+  hardware.graphics.extraPackages = [ pkgs.mesa ];
+  hardware.graphics.enable32Bit = true;
 
   # Configure network proxy if necessary
   # networking.proxy.default = "http://user:password@proxy:port/";
@@ -119,7 +118,7 @@ in
       {
         wmName = "gnome-i3";
         wmLabel = "Gnome + i3";
-        wmCommand = ''sh /home/${config.USER_NAME}/.config/i3/generate_i3_config.sh & exec i3'';
+        wmCommand = ''sh /home/${myConf.USER_NAME}/.config/i3/generate_i3_config.sh & exec i3'';
         enableGnomePanel = false;
       }
     ];
@@ -129,7 +128,7 @@ in
 
   services.xserver = {
     enable = true;
-    xkb.layout = "${config.KEYBOARD_LAYOUT}";
+    xkb.layout = "${myConf.KEYBOARD_LAYOUT}";
     xkb.options = "eurosign:e,caps:escape";
 
     windowManager.i3 = {
@@ -157,8 +156,6 @@ in
         
         i3lock-color
         brightnessctl
-        # bluetooth manager
-        blueberry
         my_script
 
         python3
@@ -168,10 +165,8 @@ in
 
 
   # ------------------------------ DISPLAY MANAGER ------------------------------
-  services.displayManager.gdm = {
-      enable = true;
-      wayland = true;
-  };
+  # gdm always uses wayland since GNOME 50 (the "wayland" option was removed in 26.05)
+  services.displayManager.gdm.enable = true;
 
   # Workaround to fix the ssh-askpass error when using plasma and gnome
   # https://discourse.nixos.org/t/have-gnome-plasma-at-the-same-time/40991
@@ -219,7 +214,7 @@ in
   # Enable sound with pipewire
   # If alsa doesnt work, make a fresh install of pulseaudio and alsa
   # cf https://discourse.nixos.org/t/cant-get-alsa-nixos-working/644
-  hardware.pulseaudio.enable = false;
+  services.pulseaudio.enable = false;
   security.rtkit.enable = true;
   services.pipewire = {
     enable = true;
@@ -243,9 +238,7 @@ in
           in super.pkgs.writeText "bg.patch" ''
             --- a/data/theme/gnome-shell-sass/widgets/_login-lock.scss
             +++ b/data/theme/gnome-shell-sass/widgets/_login-lock.scss
-            @@ -15,4 +15,8 @@ $_gdm_dialog_width: 23em;
-             /* Login Dialog */
-             .login-dialog {
+            @@ -234,2 +234,6 @@ #lockDialogGroup {
                background-color: $_gdm_bg;
             +  background-image: url('file://${bg}');
             +  background-size: cover;
@@ -260,12 +253,13 @@ in
 };
 
 
-  # Ensure the script to change the login background runs on user login
+  # Change the login background at each boot, before gdm reads it
   systemd.services.my-login-script = {
     description = "Change the login background randomly";
-    wantedBy = [ "multi-user.target" ];
-    after = [ "network.target" ];
+    wantedBy = [ "display-manager.service" ];
+    before = [ "display-manager.service" ];
     serviceConfig = {
+      Type = "oneshot";
       ExecStart = "${myLoginScript}";
       User = "root";
     };
@@ -278,9 +272,9 @@ in
   # Define a user account. Don't forget to set a password with ‘passwd’.
   
   users.mutableUsers = false;
-  users.users."${config.USER_NAME}" = {
+  users.users."${myConf.USER_NAME}" = {
     isNormalUser = true; # no privileges
-    home = "/home/${config.USER_NAME}";       # Home directory path
+    home = "/home/${myConf.USER_NAME}";       # Home directory path
     createHome = false;        # Don't create the home directory since it's a mount point
     # wheel : Enable ‘sudo’ for the user, 
     # audio : allow the user to manage audio (!!!!WARN!!! it use pulseaudio, not alsa)
@@ -341,10 +335,6 @@ in
   # List packages installed in system profile. To search, run:
   # $ nix search wget
 
-  nixpkgs.config.permittedInsecurePackages = [
-    "electron-25.9.0" # obsidian dependency
-  ];
- 
 
   environment.systemPackages = with pkgs; [
     gnome-tweaks
@@ -355,7 +345,7 @@ in
     git
     git-lfs
     htop
-    neofetch
+    fastfetch # neofetch replacement (neofetch was removed in 26.05)
     networkmanagerapplet
     openconnect # vpn
     openssl
@@ -447,6 +437,10 @@ in
   
   # Enable polkit (https://nixos.wiki/wiki/Polkit) to use sway
   security.polkit.enable = true;
+
+  # Enable Tailscale (https://tailscale.com/)
+  services.tailscale.enable = true;
+
 
   # Open ports in the firewall.
   # networking.firewall.allowedTCPPorts = [ ... ];
