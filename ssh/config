@@ -24,6 +24,11 @@ Host *gitlab.softwareheritage.org
         User Ortie
         IdentityFile ~/.ssh/swh_gitlab
 
+Host *gitlab.com
+	User Ort1e
+	IdentityFile ~/.ssh/gitlab_global_instance
+
 Host *tatooine.irisa.fr
     User clahoche
     IdentityFile ~/.ssh/tatooine_pc_port_inria_2
+    
