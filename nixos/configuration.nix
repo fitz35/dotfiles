@@ -77,6 +77,15 @@ in
   # enable experimental features
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
 
+  # keep the / partition from filling up
+  nix.gc = {
+    automatic = true;
+    dates = "weekly";
+    options = "--delete-older-than 14d"; # keep 2 weeks of generations to rollback
+  };
+  nix.settings.auto-optimise-store = true; # hard link identical files in the store
+  boot.tmp.cleanOnBoot = true; # remove the leftovers (nix-shell.* folders...) of /tmp at each boot
+
   # networking.hostName = "nixos"; # Define your hostname.
   # Pick only one of the below networking options.
   # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
