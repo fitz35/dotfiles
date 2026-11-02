@@ -9,9 +9,9 @@
       nixpkgs.url = "github:NixOS/nixpkgs/nixos-26.05";
 
       # Minecraft grub2 theme
-      minegrub-theme.url = "github:0nyr/minegrub-theme";
+      # official repo (the splash customization was fixed in https://github.com/Lxtharia/minegrub-theme/pull/35, no need of the 0nyr fork anymore)
+      minegrub-theme.url = "github:Lxtharia/minegrub-theme";
       minegrub-theme.inputs.nixpkgs.follows = "nixpkgs"; # use our stable nixpkgs instead of its pinned unstable one
-      #minegrub-theme.url = "github:Lxtharia/minegrub-theme"; # -> this the official repo, but the customization of the splashs doesnt work https://github.com/Lxtharia/minegrub-theme/pull/35 
     
       my_personnal_script.url = "github:fitz35/my_personnal_script";
       my_personnal_script.inputs.nixpkgs.follows = "nixpkgs";

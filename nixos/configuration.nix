@@ -47,6 +47,9 @@ in
       minegrub-theme = {
         enable = true;
         splash = "Lise is watching you !";
+        # one of the files in https://github.com/Lxtharia/minegrub-theme/tree/main/background_options
+        background = "background_options/1.8  - [Classic Minecraft].png";
+        boot-options-count = 7; # place the bottom bar under the 7th entry (same as the 0nyr fork)
       };
       extraEntries = ''
         menuentry "Reboot" {
