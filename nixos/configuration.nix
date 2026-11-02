@@ -63,6 +63,10 @@ in
     };
   };
 
+  # don't print the kernel errors on screen at boot (harmless "ACPI BIOS Error (bug)" from the laptop firmware)
+  # they are still available with `journalctl -b -p err`
+  boot.consoleLogLevel = 3;
+
   # ------------------------------------------
   # File system
   # ------------------------------------------
