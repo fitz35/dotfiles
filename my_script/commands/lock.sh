@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
-# This script is a wrapper for i3lock-color
-# It sets the colors and options for i3lock-color
-# i3lock-color repo: https://github.com/Raymo111/i3lock-color
+# Lock screen (xss-lock / swayidle, logout_menu) : i3lock-color in X (i3), swaylock-effects in Wayland (sway),
+# with the same colors, ring and clock.
+# i3lock-color repo: https://github.com/Raymo111/i3lock-color, swaylock-effects : https://github.com/jirutka/swaylock-effects
+
+source "$MY_SCRIPT_DIR/lib.sh"
 
 # Define color variables
 BACKGROUND_WINDOW_DARK="#1c2128"
@@ -32,6 +34,22 @@ GREEN="${GREEN}ff"
 BLUE="${BLUE}ff"
 CYAN="${CYAN}ff"
 
+if is_wayland; then
+    # swaylock wants the colors without '#' ; --daemonize : returns once locked (for swayidle before-sleep)
+    swaylock --daemonize --color=${BACKGROUND_WINDOW_DARK#\#} --inside-color=${BACKGROUND_WINDOW_DARK#\#} \
+             --inside-ver-color=${ORANGE#\#} --ring-ver-color=${YELLOW#\#} \
+             --inside-wrong-color=${RED#\#} --ring-wrong-color=${RED#\#} \
+             --ring-color=${GREEN#\#} --line-uses-inside \
+             --key-hl-color=${ORANGE#\#} --bs-hl-color=${CYAN#\#} \
+             --separator-color=${BACKGROUND_WINDOW_NORMAL#\#} \
+             --text-color=${TEXT_BRIGHT#\#} --text-ver-color=${TEXT_NORMAL#\#} --text-wrong-color=${TEXT_NORMAL#\#} \
+             --layout-text-color=${TEXT_NORMAL#\#} \
+             --clock --indicator --indicator-radius=200 \
+             --timestr="%H:%M" --datestr="%A %d %B %Y" \
+             --font="JetBrains Mono Nerd Font"
+    exit
+fi
+
 # Run i3lock-color with the specified colors
 i3lock --color=$BACKGROUND_WINDOW_DARK --inside-color=$BACKGROUND_WINDOW_NORMAL \
        --insidever-color=$ORANGE --ringver-color=$YELLOW \
@@ -43,7 +61,7 @@ i3lock --color=$BACKGROUND_WINDOW_DARK --inside-color=$BACKGROUND_WINDOW_NORMAL 
        --verif-color=$TEXT_NORMAL --wrong-color=$TEXT_NORMAL --layout-color=$TEXT_NORMAL \
        --date-color=$TEXT_BRIGHT --time-color=$TEXT_BRIGHT \
        --screen 1 --clock --indicator \
-       --date-str="%A, %m %Y" --time-size=48 --date-size=24 \
+       --date-str="%A %d %B %Y" --time-size=48 --date-size=24 \
        --radius=200 \
       --time-font="JetBrains Mono Nerd Font" --date-font="JetBrains Mono Nerd Font" \
        --layout-font="JetBrains Mono Nerd Font" --verif-font="JetBrains Mono Nerd Font" \

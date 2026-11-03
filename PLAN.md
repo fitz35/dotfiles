@@ -5,7 +5,7 @@
 - [x] Phase 1 : my_script inside dotfiles, same behaviour
 - [x] Phase 2 : polybar timers without polling
 - [x] Phase 3 : Inria VPN through NetworkManager
-- [ ] Phase 4 : my_script works on X and Wayland
+- [x] Phase 4 : my_script works on X and Wayland
 - [ ] Phase 5 : Sway session next to i3
 - [ ] Phase 6 : remove the X-only parts (later, my decision)
 

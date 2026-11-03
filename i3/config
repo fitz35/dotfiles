@@ -74,7 +74,7 @@ bindsym $mod+n exec --no-startup-id dunstctl close
 bindsym $mod+Shift+n exec --no-startup-id dunstctl history-pop
 
 # greenclip
-bindsym $mod+v exec --no-startup-id "$my_script greenclip"
+bindsym $mod+v exec --no-startup-id "$my_script clipboard"
 
 # ------------------------------------------------ window management ------------------------------------------------
 
