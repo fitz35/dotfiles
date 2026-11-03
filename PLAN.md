@@ -82,8 +82,9 @@ Out of scope : changing what the commands do (except vpn_menu), the uptime analy
 - [ ] Step 2 : remove the unused / dead packages
 - [ ] Step 3 : hardware (NVIDIA off, firmware updates, Intel thermal and video decoding)
 - [ ] Step 4 : SSH only through Tailscale, keys only
-- [ ] Step 5 : split configuration.nix into commented modules (no behaviour change)
+- [ ] Step 5 : split configuration.nix into commented modules (no behaviour change, done first : proven by an identical system)
 - [ ] Step 6 : your checks after the switch (list below)
+- [ ] Step 7 : Zed with the VS Code look (zed/ linked by install.sh)
 
 ## Diagnostic
 Machine : Dell Precision 3581, i7-13700H, Intel Raptor Lake GPU (all the outputs : laptop, DP, HDMI, dock), NVIDIA RTX A1000 (no output, free nouveau driver, suspended when idle), WiFi / Bluetooth Intel AX211, Thunderbolt dock (bolt), no fingerprint reader. System : 25.8 GB.
@@ -109,6 +110,8 @@ Machine : Dell Precision 3581, i7-13700H, Intel Raptor Lake GPU (all the outputs
 4. **SSH** : `openFirewall = false`, port 22 open on `tailscale0` only, `PasswordAuthentication = false`, `KbdInteractiveAuthentication = false`, `PermitRootLogin = "no"` ; the authorized keys stay in `~/.ssh/authorized_keys`.
 5. **Refactor** : `configuration.nix` (imports, users unchanged, stateVersion) + `modules/boot.nix` (grub, minegrub, backgrounds), `modules/desktop.nix` (GDM, sway, i3, portals, fonts, sound, notifications), `modules/services.nix` (network, VPN, ssh, tailscale, docker, dev tools), `modules/packages.nix` (apps by purpose). Checked : same system as before the split (identical store path).
 
+7. **Zed** : `zed/settings.json` in the repo, linked as `~/.config/zed/settings.json` : the VS Code defaults in use (DejaVu Sans Mono 14, normal weight, line height 1.35, UI DejaVu Sans 13, Dark Modern theme, vscode-icons, VS Code keymap), themes auto-installed. Zed vs VS Code : Rust, Python, Nix, git, Claude Code (ACP), SSH are covered ; notebooks (.ipynb), Java tooling (Maven / Gradle), Docker explorer, draw.io stay in VS Code (hybrid).
+
 ## Your checks after `sh nixos/update_config.sh` and a reboot (Step 6)
 - [ ] GDM : the random background, num lock ; the Sway and i3 sessions start
 - [ ] keyring unlocked at login : `vpn inria` connects without asking the password again
@@ -121,3 +124,4 @@ Machine : Dell Precision 3581, i7-13700H, Intel Raptor Lake GPU (all the outputs
 - [ ] firmware : `fwupdmgr get-devices` lists the BIOS and the dock
 - [ ] ssh : from another Tailscale machine with a key ; refused with a password ; port 22 closed on the wifi
 - [ ] system size : `nix path-info -S /run/current-system`
+- [ ] Zed : open a project, the look matches VS Code (font, size, colors, icons)
