@@ -35,7 +35,8 @@ BLUE="${BLUE}ff"
 CYAN="${CYAN}ff"
 
 if is_wayland; then
-    # swaylock wants the colors without '#' ; --daemonize : returns once locked (for swayidle before-sleep)
+    # swaylock wants the colors without '#' ; --daemonize : returns once locked (for swayidle before-sleep) ;
+    # one font size for the time and the date (by default it grows with the circle : the full date overflowed)
     swaylock --daemonize --color=${BACKGROUND_WINDOW_DARK#\#} --inside-color=${BACKGROUND_WINDOW_DARK#\#} \
              --inside-ver-color=${ORANGE#\#} --ring-ver-color=${YELLOW#\#} \
              --inside-wrong-color=${RED#\#} --ring-wrong-color=${RED#\#} \
@@ -44,9 +45,9 @@ if is_wayland; then
              --separator-color=${BACKGROUND_WINDOW_NORMAL#\#} \
              --text-color=${TEXT_BRIGHT#\#} --text-ver-color=${TEXT_NORMAL#\#} --text-wrong-color=${TEXT_NORMAL#\#} \
              --layout-text-color=${TEXT_NORMAL#\#} \
-             --clock --indicator --indicator-radius=200 \
+             --clock --indicator --indicator-radius=230 \
              --timestr="%H:%M" --datestr="%A %d %B %Y" \
-             --font="JetBrains Mono Nerd Font"
+             --font="JetBrains Mono Nerd Font" --font-size=26
     exit
 fi
 
