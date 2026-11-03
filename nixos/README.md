@@ -5,7 +5,7 @@ The system is built directly from this folder (a flake, with its `flake.lock`) :
 | File | Content |
 | --- | --- |
 | `flake.nix` | the inputs (nixpkgs stable, minegrub, my_script) and one entry per machine |
-| `configuration.nix` | the configuration shared by all the machines |
+| `configuration.nix` | the configuration shared by all the machines : the user and the imports of `modules/` (boot, desktop, services, packages) |
 | `hosts/<hostname>/` | the machine specific part : `hardware-configuration.nix` (generated) and `default.nix` (user name, keyboard, encryption) |
 | `update_config.sh` | `nixos-rebuild switch` for this machine (picked by its hostname) |
 | `flake_update.sh` | update `flake.lock` (then run `update_config.sh`) |

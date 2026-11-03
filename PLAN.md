@@ -82,7 +82,7 @@ Out of scope : changing what the commands do (except vpn_menu), the uptime analy
 - [ ] Step 2 : remove the unused / dead packages
 - [ ] Step 3 : hardware (NVIDIA off, firmware updates, Intel thermal and video decoding)
 - [ ] Step 4 : SSH only through Tailscale, keys only
-- [ ] Step 5 : split configuration.nix into commented modules (no behaviour change, done first : proven by an identical system)
+- [x] Step 5 : split configuration.nix into commented modules (no behaviour change, done first : proven by an identical system)
 - [ ] Step 6 : your checks after the switch (list below)
 - [ ] Step 7 : Zed with the VS Code look (zed/ linked by install.sh)
 
