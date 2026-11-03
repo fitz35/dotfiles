@@ -22,10 +22,24 @@
   },
   "base_keymap": "VSCode",
 
-  // the theme and icons, installed automatically at the first start
+  // installed automatically at the first start : the theme and icons, then the equivalents of my VS Code extensions
   "auto_install_extensions": {
     "vscode-dark-modern": true,
-    "vscode-icons": true
+    "vscode-icons": true,
+    "nix": true, // nix-ide
+    "svelte": true, // svelte-vscode
+    "vue": true, // volar
+    "java": true, // java pack (jdtls, debugger)
+    "latex": true, // latex-workshop (texlab ; the pdf opens in an external viewer)
+    "dockerfile": true, // docker
+    "docker-compose": true,
+    "rainbow-csv": true, // rainbow-csv
+    "ron": true, // vscode-ron
+    "xml": true, // vscode-xml
+    "neocmake": true, // cmake-tools
+    "django": true, // vscode-django
+    "git-firefly": true, // git syntax (commit messages, .gitignore...)
+    "http": true // http-client
   },
   "theme": "VSCode Dark Modern",
   "icon_theme": "VSCode Icons for Zed (Dark)",
@@ -47,10 +61,40 @@
     "font_size": 14
   },
 
-  "languages": {
-    "Rust": {
-      "inlay_hints": {
-        "enabled": true
+  // inlay hints (types, argument names) everywhere, as in VS Code (off by default in Zed)
+  "inlay_hints": {
+    "enabled": true
+  },
+
+  // formatting : the Zed defaults (format on save, Ruff for Python, which also sorts the imports)
+
+  "lsp": {
+    // python : basedpyright (Zed's default, instead of Pylance), with my VS Code Pylance settings ;
+    // typeCheckingMode isn't a Zed setting : "basic" goes in the pyrightconfig.json / pyproject.toml of a project
+    // ([tool.basedpyright]), Zed's default is "standard" (stricter) ; autoFormatStrings is Pylance only
+    "basedpyright": {
+      "settings": {
+        "basedpyright": {
+          "analysis": {
+            "diagnosticMode": "workspace",
+            "autoImportCompletions": true,
+            "inlayHints": {
+              "callArgumentNames": true,
+              "functionReturnTypes": true,
+              "variableTypes": true
+            }
+          }
+        }
+      }
+    },
+    // rust : rust-analyzer from the PATH (the nix shell's, through direnv) is used first, as in VS Code
+    "rust-analyzer": {
+      "initialization_options": {
+        "imports": {
+          "granularity": {
+            "group": "module"
+          }
+        }
       }
     }
   }
