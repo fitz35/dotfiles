@@ -1,68 +1,28 @@
-# Installation
+# NixOS
 
-## From fedora
+The system is built directly from this folder (a flake, with its `flake.lock`) :
 
-[Here](https://nixos.org/manual/nixos/stable/#sec-installing-from-other-distro) :
-Install the tool :
+| File | Content |
+| --- | --- |
+| `flake.nix` | the inputs (nixpkgs stable, minegrub, my_script) and one entry per machine |
+| `configuration.nix` | the configuration shared by all the machines |
+| `hosts/<hostname>/` | the machine specific part : `hardware-configuration.nix` (generated) and `default.nix` (user name, keyboard, encryption) |
+| `update_config.sh` | `nixos-rebuild switch` for this machine (picked by its hostname) |
+| `flake_update.sh` | update `flake.lock` (then run `update_config.sh`) |
 
-```shell
-nix-env -f '<nixpkgs>` -iA nixos-install-tools
-```
+> WARN : stay on the stable release (`nixos-XX.YY`), not unstable.
 
-After, you must mount to `/mnt` the partition where nixos will be installed, and the efi partition to `/mnt/boot/efi`. Next, launch the tool :
+> WARN : a new file must be added to git (`git add`) before a rebuild, else the flake doesn't see it.
 
-```shell
-sudo `which nixos-generate-config` --root /mnt
-```
+The installation of a new machine is described in the [README](../README.md#new-machine). To install from another linux instead of the ISO, see [here](https://nixos.org/manual/nixos/stable/#sec-installing-from-other-distro) (mount the partitions in `/mnt`, the efi one in `/mnt/boot/efi`, then `nixos-install --flake`).
 
-You can then override the nixos configuration at `/mnt/etc/nixos/configuration.nix`
+Old generations are removed automatically every week (`nix.gc`, 2 weeks kept), and `/tmp` is cleaned at each boot.
 
-You can execute the following to link :
+## Direnv
 
-```shell
-sudo rm /mnt/etc/nixos/configuration.nix
-sudo cp ./config_nix.nix /mnt/etc/nixos/config_nix.nix
-sudo cp ./flake.nix /mnt/etc/nixos/flake.nix
-sudo cp ./configuration.nix /mnt/etc/nixos/configuration.nix
-```
+The extension nix-env-selector doesn't work with [flake](https://github.com/arrterian/nix-env-selector/issues/53), a workaround is to use [nix direnv](https://github.com/nix-community/nix-direnv).
 
-You can modify the config_nix.nix file with partition name for example.
-
-After, you must export the NIX_PATH :
-
-```shelll
-export NIX_PATH=nixpkgs=/home/clement/.nix-defexpr/channels/nixpkgs
-```
-
-After, build nixos :
-
-```shell
-sudo PATH="$PATH" NIX_PATH="$NIX_PATH" `which nixos-install` --root /mnt
-```
-
-### Inside nixos
-
-After modification of the configuration file, reload with
-
-```shell
-sudo nixos-rebuild switch
-```
-
-Theire is the script too : `sudo sh ./update_config.sh`
-
-> WARN : don't forget to modify config_nix.nix !
-
-## Flake
-
-Flake is used to make reproducible environnement.
-
-### Direnv
-
-The extension nix-env-selector dont work with [flake](https://github.com/arrterian/nix-env-selector/issues/53), a workaround is to use [nix direnv](https://github.com/nix-community/nix-direnv).
-
-`programs.direnv.enable = true;` allow the use of `use flake` in `.envrc` and environement management like this [extension](https://marketplace.visualstudio.com/items?itemName=mkhl.direnv).
-
-> WARN : need to add `eval "$(direnv hook bash)"` to bashrc, or in the config
+`programs.direnv.enable = true;` allows `use flake` in `.envrc` (the bash hook is added automatically) and environment management like this [extension](https://marketplace.visualstudio.com/items?itemName=mkhl.direnv).
 
 ## Locales
 
@@ -70,37 +30,18 @@ The extension nix-env-selector dont work with [flake](https://github.com/arrteri
 
 > Warn : Polybar need us_US
 
-## Filesystem
+# Sound
 
-When installing nixos using the ISO, mount the relewant disk in the `/mnt` file system, and generate the `hardware-configuration.nix` with `generate-config --root /mnt`. Then, you can custom the `configuration.nix` (activate `nix.settings.experimental-features = [ "nix-command" "flakes" ];` for example) 
-
-# sound
 > WARN : Don't use pulseaudio daemon, it will screw up the sound config ! See [here](https://discourse.nixos.org/t/cant-get-alsa-nixos-working/644/2) But you can add pulseaudio as package to have pactl for example.
-
-# OpenGL
-
-[Here](https://nixos.wiki/wiki/OpenGL), Add to configuration.nix
-
-```nix
-hardware.graphics.enable = true;
-hardware.graphics.extraPackages = [ pkgs.mesa ];
-environment.systemPackages = with pkgs; [
-    mesa
-];
-```
 
 # Using zotero
 
-To use effictevly zotero in nixeos, we must follow [these](https://nixos.wiki/wiki/Zotero).
+To use effectively zotero in nixos, we must follow [these](https://nixos.wiki/wiki/Zotero).
 
-# GDM [Background](https://discourse.nixos.org/t/gdm-background-image-and-theme/12632/4) image
+# Backgrounds
 
-The [patch](https://gitlab.gnome.org/GNOME/gnome-shell/-/issues/3877) must be in the nixos folder (`/etc/nixos/`).
-
-> WARN : This doesn't work, apply the patch directly
-
-[Here](https://discourse.nixos.org/t/unable-to-change-background-in-gdm/33563/4) is the steps to apply the patch directly.
-
+- GDM : gnome-shell is patched (overlay in `configuration.nix`, see [here](https://discourse.nixos.org/t/unable-to-change-background-in-gdm/33563/4)) to display `/var/lib/login-background/background.png`, a random image of `assets/login_images/` chosen at each boot.
+- grub : a random [minegrub](https://github.com/Lxtharia/minegrub-theme) background is chosen at each boot, for the next one.
 
 # Wifi 802.1X (inria-interne, eduroam)
 
@@ -117,10 +58,3 @@ nmcli connection modify eduroam 802-1x.ca-cert /etc/nixos/wifi-certs/eduroam.pem
 # Xsession
 
 The description can be found [here](https://gist.github.com/bennofs/bb41b17deeeb49e345904f2339222625).
-
-# clean OS
-
-```shell
-sudo nix-env --delete-generations 2d
-sudo nix-collect-garbage -d
-```

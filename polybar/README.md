@@ -1,31 +1,6 @@
-# Installation
+# Polybar
 
-## Fedora
-
-```shell
-sudo dnf install polybar
-sudo dnf install rofi
-```
-
-## ubuntu
-```shell
-sudo apt install polybar rofi
-
-```
-
-## Configuration
-
-To config :
-
-```shell
-mkdir ~/.config/polybar/
-ln ./config_placeholder.ini ~/.config/polybar/config_placeholder.ini
-ln ./launch.sh ~/.config/polybar/launch.sh
-ln ./logout_menu.sh ~/.config/polybar/logout_menu.sh
-chmod +x ~/.config/polybar/logout_menu.sh
-```
-
-The script launch regenerate the config.ini replacing the placeholder.
+Installed by `nixos/configuration.nix`, this folder is linked as `~/.config/polybar` by `install.sh`. `launch.sh` (run by i3 and after each screen switch) starts a bar per screen, with the battery and adapter of the machine (`POLYBAR_BATTERY` / `POLYBAR_ADAPTER`, used by `config.ini`).
 
 ## Bluetooth
 
@@ -33,22 +8,14 @@ In order to add the bluetooth module, `blueman` must be installed (`services.blu
 
 ## spotify
 
-Repo [here](https://github.com/PrayagS/polybar-spotify/tree/master). Dependencies :
-
-```shell
-zscroll playerctl 
-```
+Repo [here](https://github.com/PrayagS/polybar-spotify/tree/master). Dependencies : `zscroll playerctl` (installed by nixos).
 
 # My_script
 
-[here](https://github.com/fitz35/my_personnal_script) are my personnal script. PAckage with nixos.
+[here](https://github.com/fitz35/my_personnal_script) are my personnal script. Packaged with nixos.
 
 # Fonts
 
-## Install fonts from [Nerd Fonts](https://www.nerdfonts.com/#home)
-
-Download the fonts you want, for instance **JetBrainsMono**, `unzip JetBrainsMono.zip`, then `cp *.ttf ~/.fonts/`. Now, update the font cache with `fc-cache -fv`. You can check for installed fonts with `fc-list | grep "SomeFontName"`.
+The bar uses the JetBrainsMono Nerd Font, installed by nixos (`fonts.packages`). You can check for installed fonts with `fc-list | grep -i "JetBrains"`.
 
 > Remember to use a terminal application that support well Nerd Fonts like [Kitty](https://github.com/kovidgoyal/kitty).
-
-`$ fc-list | grep -i "JetBrains"`: list installed JetBrains fonts
