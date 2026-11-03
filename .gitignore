@@ -1,3 +1,4 @@
-.direnv/.claude/
+.direnv/
+.claude/
 i3/screens.conf
 result
