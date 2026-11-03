@@ -96,6 +96,10 @@ in
   # they are still available with `journalctl -b -p err`
   boot.consoleLogLevel = 3;
 
+  # don't arm the hardware watchdog (iTCO_wdt) at reboot / power off : it only resets a hung reboot after 10min,
+  # and prints "watchdog: watchdog0: watchdog did not stop!" at each shutdown
+  systemd.settings.Manager.RebootWatchdogSec = "0";
+
   # ------------------------------------------
   # File system
   # ------------------------------------------
@@ -469,6 +473,9 @@ in
 
   # docker
   virtualisation.docker.enable = true;
+  # stop the containers with the daemon (default true : they are left running for a docker upgrade, then killed
+  # at the end of the shutdown, slow and unclean for postgres, "Exited (255)")
+  virtualisation.docker.liveRestore = false;
 
   # direnv and .envrc (https://github.com/nix-community/nix-direnv)
   programs.direnv.enable = true; # also adds the direnv hook to bash
