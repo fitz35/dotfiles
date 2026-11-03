@@ -221,6 +221,21 @@ in
   };
 
 
+  # ------------------------------ SWAY (i3 on Wayland, next to the i3 session) ------------------------------
+  # config : sway/config of the repo (shares i3/common.conf), bar : waybar/ ; GDM offers "Sway" and "i3"
+  programs.sway = {
+    enable = true;
+    wrapperFeatures.gtk = true; # gtk apps get the session environment
+    extraPackages = with pkgs; [
+      waybar # bar
+      kanshi # screen profiles
+      swayidle # lock after 2 min (my_script lock)
+      grim slurp # screenshots
+    ];
+  };
+  # screen sharing (zoom, discord, firefox) and screenshots through the portal on sway
+  xdg.portal.wlr.enable = true;
+
   # ------------------------------ DISPLAY MANAGER ------------------------------
   # gdm always uses wayland since GNOME 50 (the "wayland" option was removed in 26.05)
   services.displayManager.gdm.enable = true;

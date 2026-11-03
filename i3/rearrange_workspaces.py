@@ -9,12 +9,17 @@ from typing import Dict, List
 
 DIR = os.path.dirname(os.path.abspath(__file__))
 
-# in the i3 order : the workspace names, the screens, then the rules using both
-I3_CONFIGS = [os.path.join(DIR, name) for name in ('config', 'screens.conf', 'workspaces.conf')]
+# in the i3 order : the workspace names (common.conf), the screens, then the rules using both
+# (in sway, the screens are in ~/.config/sway/screens.conf)
+SCREENS_CONF = os.path.expanduser('~/.config/sway/screens.conf') if os.environ.get('WAYLAND_DISPLAY') else os.path.join(DIR, 'screens.conf')
+I3_CONFIGS = [os.path.join(DIR, 'config'), os.path.join(DIR, 'common.conf'), SCREENS_CONF, os.path.join(DIR, 'workspaces.conf')]
+
+# i3-msg in i3, swaymsg in sway (same commands and replies)
+WM_MSG = 'swaymsg' if os.environ.get('WAYLAND_DISPLAY') else 'i3-msg'
 
 
 def i3_msg(*args: str) -> list:
-    return json.loads(subprocess.run(['i3-msg', *args], capture_output=True, text=True, check=True).stdout)
+    return json.loads(subprocess.run([WM_MSG, *args], capture_output=True, text=True, check=True).stdout)
 
 def parse_workspace_outputs(config: str) -> Dict[str, List[str]]:
     """return a dict with the workspace name as key and the assigned outputs (by priority) as value"""

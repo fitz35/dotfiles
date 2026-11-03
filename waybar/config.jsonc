@@ -1,0 +1,117 @@
+// waybar (sway bar), linked as ~/.config/waybar by install.sh : the modules of the polybar (i3), same colors (style.css).
+// The polybar toggles are drawers : hover the  icon for the system stats, the clock for the uptime / timer / chronometer.
+{
+    "layer": "top",
+    "position": "top",
+    "height": 34,
+    "spacing": 10,
+
+    "modules-left": ["sway/workspaces", "sway/mode", "sway/window"],
+    "modules-right": ["battery", "mpris", "pulseaudio", "backlight", "group/system", "network", "bluetooth", "group/time", "tray", "custom/power"],
+
+    "sway/workspaces": {
+        "disable-scroll": true
+    },
+    "sway/window": {
+        "max-length": 60
+    },
+
+    "battery": {
+        "states": { "warning": 30, "critical": 20 },
+        "format": "{icon}  {capacity}%",
+        "format-charging": "󰂄 {capacity}%",
+        "format-full": "{icon} Fully charged",
+        "format-icons": ["", "", "", "", ""]
+    },
+    "mpris": {
+        "player": "spotify",
+        "format": " {artist} - {title}",
+        "format-paused": " {artist} - {title}",
+        "max-length": 40
+    },
+    "pulseaudio": {
+        "format": "{icon} {volume}%",
+        "format-muted": "󰝟 muted",
+        "format-icons": { "default": ["", "", ""] },
+        "on-click": "pactl set-sink-mute @DEFAULT_SINK@ toggle",
+        "on-click-middle": "pavucontrol"
+    },
+    "backlight": {
+        "format": "󱩏 {percent}%",
+        "on-scroll-up": "brightnessctl set +10%",
+        "on-scroll-down": "brightnessctl set 10%-"
+    },
+
+    "group/system": {
+        "orientation": "inherit",
+        "drawer": { "transition-duration": 300, "children-class": "drawer-child", "transition-left-to-right": false },
+        "modules": ["custom/system", "memory", "cpu", "temperature"]
+    },
+    "custom/system": {
+        "format": "",
+        "tooltip": false
+    },
+    "memory": {
+        "format": " {percentage}%"
+    },
+    "cpu": {
+        "format": " {usage}%"
+    },
+    "temperature": {
+        "format": " {temperatureC}°C",
+        "critical-threshold": 85
+    },
+
+    "network": {
+        "format-wifi": " {essid}",
+        "format-ethernet": "󰈀 {ifname}",
+        "format-disconnected": "󰖪",
+        "tooltip-format": "{ifname} {ipaddr}",
+        "on-click": "nm-connection-editor"
+    },
+    "bluetooth": {
+        "format": " {status}",
+        "format-connected": " {device_alias}",
+        "on-click": "blueman-manager"
+    },
+
+    "group/time": {
+        "orientation": "inherit",
+        "drawer": { "transition-duration": 300, "children-class": "drawer-child", "transition-left-to-right": false },
+        "modules": ["clock", "custom/uptime", "custom/timer", "custom/chronometer"]
+    },
+    "clock": {
+        "format": "{:%H:%M}",
+        "format-alt": "{:%A %d %B %Y}",
+        "tooltip-format": "<tt>{calendar}</tt>"
+    },
+    "custom/uptime": {
+        "exec": "my_script uptime",
+        "interval": 60,
+        "format": "󰄉 {}",
+        "on-click": "my_script uptime -display_entry"
+    },
+    "custom/timer": {
+        "exec": "my_script timer watch",
+        "format": "󰔛 {}",
+        "on-click": "my_script timer toggle",
+        "on-click-right": "my_script timer reset",
+        "on-scroll-up": "my_script timer add 5",
+        "on-scroll-down": "my_script timer add -5"
+    },
+    "custom/chronometer": {
+        "exec": "my_script chronometer watch",
+        "format": " {}",
+        "on-click": "my_script chronometer toggle",
+        "on-click-right": "my_script chronometer reset"
+    },
+
+    "tray": {
+        "spacing": 8
+    },
+    "custom/power": {
+        "format": "",
+        "tooltip": false,
+        "on-click": "my_script logout_menu"
+    }
+}

@@ -1,0 +1,75 @@
+/* waybar style : the colors of the polybar (polybar/config.ini [colors]) */
+@define-color background #1c2128;
+@define-color background-alt #2d333b;
+@define-color foreground #adbac7;
+@define-color primary #ff8700;
+@define-color secondary #f0b746;
+@define-color alert #d7005f;
+@define-color disabled #707880;
+
+* {
+    font-family: "JetBrainsMono Nerd Font";
+    font-size: 15px;
+    border: none;
+    border-radius: 0;
+    min-height: 0;
+}
+
+window#waybar {
+    background-color: @background;
+    color: @foreground;
+}
+
+#workspaces button {
+    padding: 0 8px;
+    color: @foreground;
+    background-color: transparent;
+}
+
+#workspaces button.focused {
+    background-color: @background-alt;
+    box-shadow: inset 0 -3px @primary;
+}
+
+#workspaces button.urgent {
+    background-color: @alert;
+}
+
+#mode {
+    color: @secondary;
+}
+
+#window {
+    color: @primary;
+}
+
+/* the module icons and values, like the primary prefixes of the polybar */
+#clock,
+#custom-uptime,
+#custom-timer,
+#custom-chronometer,
+#custom-system,
+#custom-power,
+#backlight {
+    color: @primary;
+}
+
+#battery.warning {
+    color: @secondary;
+}
+
+#battery.critical,
+#temperature.critical,
+#pulseaudio.muted {
+    color: @alert;
+}
+
+#network.disconnected,
+#bluetooth.off,
+#bluetooth.disabled {
+    color: @disabled;
+}
+
+#custom-power {
+    padding-right: 10px;
+}

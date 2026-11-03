@@ -6,7 +6,7 @@
 - [x] Phase 2 : polybar timers without polling
 - [x] Phase 3 : Inria VPN through NetworkManager
 - [x] Phase 4 : my_script works on X and Wayland
-- [ ] Phase 5 : Sway session next to i3
+- [ ] Phase 5 : Sway session next to i3 (session, shared config and waybar done ; next : first login, kanshi profiles, sway screens)
 - [ ] Phase 6 : remove the X-only parts (later, my decision)
 
 ## Context
