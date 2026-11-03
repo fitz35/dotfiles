@@ -2,6 +2,8 @@
 
 The NixOS system (`nixos/`) and the home configuration (i3, polybar, screens...) of my machines.
 
+Work in progress : [PLAN.md](PLAN.md) (my_script merged here, Inria VPN in NetworkManager, Sway next to i3).
+
 | Folder | Content |
 | --- | --- |
 | `nixos/` | the NixOS flake : system, packages, services. One folder per machine in `nixos/hosts/` |
