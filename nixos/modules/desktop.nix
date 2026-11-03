@@ -1,4 +1,4 @@
-# Desktop : the login (GDM), the sway session (default) and the i3 one, their tools, sound, fonts, portals, notifications.
+# Desktop : the login (GDM), the sway session (default) and the i3 one (no GNOME desktop), their tools, sound, fonts, portals, notifications.
 # Their home config (i3/, sway/, waybar/, polybar/...) is linked by install.sh.
 { config, lib, pkgs, myConf, ... }:
 
@@ -69,44 +69,17 @@ in
     };
   };
 
-  # ------------------------------ GNOME ------------------------------
-  services.desktopManager.gnome = {
-    enable = true;
-    flashback.customSessions = [
-      {
-        wmName = "gnome-i3";
-        wmLabel = "Gnome + i3";
-        wmCommand = "i3"; # the screens are set by the sessionCommands, as for the i3 session
-        enableGnomePanel = false;
-      }
-    ];
-  };
-  # remove gnome apps
-  environment.gnome.excludePackages = (with pkgs; [
-    gnome-photos
-    gnome-tour
-    gnome-text-editor
-      ]) ++ (with pkgs; [
-    gnome-music
-    epiphany # web browser
-    geary # email reader
-    gnome-characters
-    totem # video player
-    tali # poker game
-    iagno # go game
-    hitori # sudoku game
-    atomix # puzzle game
-    gnome-calculator
-    yelp # help viewer
-    gnome-maps
-    gnome-weather
-    gnome-contacts
-    simple-scan
-  ]);
-  # Workaround to fix the ssh-askpass error when using plasma and gnome
-  # https://discourse.nixos.org/t/have-gnome-plasma-at-the-same-time/40991
-  programs.ssh.askPassword = pkgs.lib.mkForce "${pkgs.seahorse.out}/libexec/seahorse/ssh-askpass";
+  # ------------------------------ GNOME PIECES ------------------------------
+  # the GNOME desktop itself is not installed (never used : only GDM, sway and i3), only the pieces used outside it
+  services.gnome.gnome-keyring.enable = true; # password store (vpn, ssh keys...), unlocked at the login (login PAM)
+  services.gvfs.enable = true; # nautilus : trash, phones (mtp), network shares
+  services.hardware.bolt.enable = true; # authorize the thunderbolt dock
+  services.upower.enable = true; # battery level (waybar, polybar)
+  services.power-profiles-daemon.enable = true; # power modes (powerprofilesctl)
+  programs.dconf.enable = true; # settings of the gtk apps
+  # ssh keys : the ssh-agent of programs.ssh.startAgent, not the one of the keyring ; passphrases asked in a window
   services.gnome.gcr-ssh-agent.enable = false;
+  programs.ssh.askPassword = "${pkgs.seahorse.out}/libexec/seahorse/ssh-askpass";
 
   # ------------------------------ SWAY (default session) ------------------------------
   # config : sway/config of the repo (shares i3/common.conf), bar : waybar/, screens : kanshi/
@@ -186,10 +159,8 @@ in
   # portals : file chooser, open with, screen sharing (wlr, on sway)
   xdg.portal = {
     enable = true;
-    extraPortals = [
-      pkgs.xdg-desktop-portal-gtk
-      pkgs.xdg-desktop-portal-gnome
-    ];
+    # the gnome portal needs a running GNOME session : gtk (file chooser...) and wlr (screen sharing, sway) are enough
+    extraPortals = [ pkgs.xdg-desktop-portal-gtk ];
     xdgOpenUsePortal = true;
   };
   xdg.portal.wlr.enable = true;

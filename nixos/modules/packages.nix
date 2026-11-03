@@ -41,7 +41,6 @@
   ];
 
   environment.systemPackages = with pkgs; [
-    gnome-tweaks
     vim
     wget
     gedit

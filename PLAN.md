@@ -78,7 +78,7 @@ Out of scope : changing what the commands do (except vpn_menu), the uptime analy
 # NixOS config : cleanup and refactor (2026-11-03)
 
 ## Status
-- [ ] Step 1 : remove the GNOME desktop, keep its useful pieces explicitly
+- [x] Step 1 : remove the GNOME desktop, keep its useful pieces explicitly
 - [ ] Step 2 : remove the unused / dead packages
 - [ ] Step 3 : hardware (NVIDIA off, firmware updates, Intel thermal and video decoding)
 - [ ] Step 4 : SSH only through Tailscale, keys only
