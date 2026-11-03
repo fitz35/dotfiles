@@ -7,6 +7,6 @@
 # at login, i3 isn't started yet and the config is generated before it (see the nixos configuration)
 i3-msg -t get_version > /dev/null 2>&1 || exit 0
 
-sh "$HOME/.config/i3/generate_i3_config.sh"
+python3 "$HOME/.config/i3/screen_management.py" -e
 i3-msg reload
 python3 "$HOME/.config/i3/rearrange_workspaces.py"

@@ -9,7 +9,8 @@ from typing import Dict, List
 
 DIR = os.path.dirname(os.path.abspath(__file__))
 
-I3_CONFIG = os.path.join(DIR, 'config')
+# in the i3 order : the workspace names, the screens, then the rules using both
+I3_CONFIGS = [os.path.join(DIR, name) for name in ('config', 'screens.conf', 'workspaces.conf')]
 
 
 def i3_msg(*args: str) -> list:
@@ -44,8 +45,13 @@ if __name__ == '__main__':
     parser = get_argv_parser()
     args = parser.parse_args()
 
-    with open(I3_CONFIG) as config_file:
-        assignments = parse_workspace_outputs(config_file.read())
+    config = ''
+    for path in I3_CONFIGS:
+        if not os.path.exists(path):  # screens.conf isn't generated yet
+            continue
+        with open(path) as config_file:
+            config += config_file.read() + '\n'
+    assignments = parse_workspace_outputs(config)
     active_outputs = {output['name'] for output in i3_msg('-t', 'get_outputs') if output['active']}
     workspaces = i3_msg('-t', 'get_workspaces')
 
