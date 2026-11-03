@@ -130,6 +130,8 @@ in
   # Pick only one of the below networking options.
   # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
   networking.networkmanager.enable = true;  # Easiest to use and most distros use this by default.
+  # VPN : the "vpn inria" connection (AnyConnect, password in the keyring), toggled by my_script vpn_menu or nm-applet
+  networking.networkmanager.plugins = [ pkgs.networkmanager-openconnect ];
 
   # bluetooth
   hardware.bluetooth.enable = true;
@@ -384,8 +386,6 @@ in
 
       kdePackages.okular# pdf viewer
 
-      openvpn
-
       obsidian # note taking
 
       warp-terminal
@@ -419,7 +419,7 @@ in
     htop
     fastfetch # neofetch replacement (neofetch was removed in 26.05)
     networkmanagerapplet
-    openconnect # vpn
+    openconnect # vpn (also used by ~/Documents/certificat/inria-intern/connect_to_vpn.sh, until it's retired)
     openssl
     direnv
     gcc

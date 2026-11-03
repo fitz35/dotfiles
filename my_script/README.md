@@ -12,7 +12,7 @@ my_script <command> [arguments]
 | `timer <add [s]\|toggle\|reset\|display\|watch>` | polybar (`watch`) | countdown (60s by default, scroll ±5s) |
 | `uptime [-display_entry]` | polybar | daily time spent on the computer, saved in `~/daily_uptime.txt` (analysed in [my_personnal_script](https://github.com/fitz35/my_personnal_script)) |
 | `github_menu <code\|terminal>` | i3 `$mod+t` / `$mod+Alt+t` | open a project folder (`PARENT_FOLDERS` / `HAND_PICKED_FOLDERS`) in vscode (inside `nix develop` if it has a flake) or kitty |
-| `vpn_menu` | i3 `$mod+w` | start a vpn / ssh connection in kitty |
+| `vpn_menu` | i3 `$mod+w` | connect / disconnect a NetworkManager VPN (e.g. `vpn inria`), with a notification |
 | `greenclip` | i3 `$mod+v` | clipboard history, paste the chosen entry |
 | `logout_menu` | i3 `$mod+Escape`, power button, polybar | lock / logout / reboot / shutdown |
 | `lock` | xss-lock, `logout_menu` | i3lock-color lock screen |

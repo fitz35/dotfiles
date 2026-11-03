@@ -12,7 +12,7 @@ Work in progress : [PLAN.md](PLAN.md) (my_script merged here, Inria VPN in Netwo
 | `assets/` | wallpapers (`background_image/`) and login backgrounds (`login_images/`) |
 | `my_script/` | the commands of i3 and polybar (rofi menus, lock, wallpaper, polybar modules), installed by nixos |
 | `fonts/`, `greenclip/`, `dunst/` | custom font, clipboard manager config, notifications style |
-| `ssh/`, `openvpn/` | ssh hosts and vpn connections (secrets stay local) |
+| `ssh/` | ssh hosts (the private ones stay local) |
 | `nix/` | dev shells (python, swh mining) |
 | `install.sh` | links the home configuration in `~` |
 
@@ -25,7 +25,7 @@ Work in progress : [PLAN.md](PLAN.md) (my_script merged here, Inria VPN in Netwo
 5. The local secrets, not in this repository :
    - ssh key for github : generate a [key](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent) for each OS and add it to github (test : `ssh -T git@github.com`). The private ssh hosts are added in `~/.ssh/config` (copied once from `ssh/config`).
    - wifi 802.1X certificates in `/etc/nixos/wifi-certs/` (see [nixos/README.md](nixos/README.md#wifi-8021x-inria-interne-eduroam)).
-   - vpn : `.env` and `pass.txt` of each `~/.config/openvpn/client/*/` (from the `.bk` templates).
+   - vpn : create the NetworkManager connection once with `nm-connection-editor` (Inria : AnyConnect, gateway `vpn.inria.fr/all`, CA certificate kept outside the repository), the password is saved in the keyring.
    - screens : save the new screen setups with autorandr (see [i3/README.md](i3/README.md#multiscreen)).
 
 Then, to apply a change of `nixos/` : `sh nixos/update_config.sh`, and to update the packages : `sh nixos/flake_update.sh` then `sh nixos/update_config.sh`. The home configuration is linked, a change is applied by reloading i3 (`$mod+Shift+c`).

@@ -37,12 +37,8 @@ for font in "$repo_dir"/fonts/*.ttf; do
     link "fonts/$(basename "$font")" "$HOME/.fonts/$(basename "$font")"
 done
 
-# copied, not linked :
-# - ssh : the local config keeps the private hosts that aren't in the repository
-# - openvpn : the local .env and pass.txt (not versioned) are next to the repository files
+# copied, not linked : the local ssh config keeps the private hosts that aren't in the repository
 mkdir -p "$HOME/.ssh"
 cp -n "$repo_dir/ssh/config" "$HOME/.ssh/config"
-mkdir -p "$HOME/.config/openvpn/client"
-cp -R "$repo_dir/openvpn/client/." "$HOME/.config/openvpn/client/"
 
 echo "Dotfiles linked"
