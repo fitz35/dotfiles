@@ -19,6 +19,34 @@ let
     IMG=$(ls /etc/nixos/login_images/ | shuf -n 1)
     cp "/etc/nixos/login_images/$IMG" "/etc/nixos/background.png"
   '';
+  # script to pick a grub background at each boot (randomly choose a minegrub background, shown at the next boot)
+  # nixos-rebuild copies the theme in /boot/theme, with the background chosen in the minegrub-theme options
+  myGrubBackgroundScript = pkgs.writeShellScript "my-grub-background.sh" ''
+    MINEGRUB="${inputs.minegrub-theme}"
+    THEME_DIR="/boot/theme"
+    [ -d "$THEME_DIR" ] || exit 0
+
+    IMG=$(ls "$MINEGRUB/background_options/" | shuf -n 1)
+    cp "$MINEGRUB/background_options/$IMG" "$THEME_DIR/background.png"
+    cp "$MINEGRUB/background_options/$IMG" "/boot/background.png"
+
+    # the backgrounds from 1.15 use the modern buttons (same rule as the minegrub update_theme.py)
+    STYLE="classic"
+    COLORS="#ffffa0 #3f3f28"
+    if [[ "$IMG" =~ ^([0-9]+)\.([0-9]+) ]] && (( BASH_REMATCH[1] > 1 || (BASH_REMATCH[1] == 1 && BASH_REMATCH[2] >= 15) )); then
+      STYLE="modern"
+      COLORS="#ffffff #383838"
+    fi
+    cp "$MINEGRUB/button_options/$STYLE/"selected_item_*.png "$THEME_DIR/"
+    # the first selected_item_color is the text, the second the shadow
+    ${pkgs.gawk}/bin/awk -v colors="$COLORS" '
+      BEGIN { split(colors, c, " ") }
+      /selected_item_color = "/ { n++; sub(/selected_item_color = "[^"]+"/, "selected_item_color = \"" c[n] "\"") }
+      { print }
+    ' "$THEME_DIR/theme.txt" > "$THEME_DIR/theme.txt.new"
+    mv "$THEME_DIR/theme.txt.new" "$THEME_DIR/theme.txt"
+    echo "grub background for the next boot : $IMG ($STYLE buttons)"
+  '';
   # hashed password
   #mkpasswd -m sha-512
   USER_HASHED_PASSWORD = "$6$bIx/kUybHUmZ.QMQ$VimchBjbSHObo3MdTcmf3rqAax/QdVWzofy8epjnSilKzKUUlMr5fE34q/f903023PQYUsXYwCJ/igeWw8k.y1";
@@ -48,6 +76,7 @@ in
         enable = true;
         splash = "Lise is watching you !";
         # one of the files in https://github.com/Lxtharia/minegrub-theme/tree/main/background_options
+        # only used until the next boot, then my-grub-background picks a random one at each boot
         background = "background_options/1.8  - [Classic Minecraft].png";
         boot-options-count = 7; # place the bottom bar under the 7th entry (same as the 0nyr fork)
       };
@@ -278,6 +307,18 @@ in
     serviceConfig = {
       Type = "oneshot";
       ExecStart = "${myLoginScript}";
+      User = "root";
+    };
+  };
+
+  # Change the grub background at each boot (grub is already displayed, so it is used at the next boot)
+  systemd.services.my-grub-background = {
+    description = "Change the grub background randomly for the next boot";
+    wantedBy = [ "multi-user.target" ];
+    unitConfig.RequiresMountsFor = "/boot";
+    serviceConfig = {
+      Type = "oneshot";
+      ExecStart = "${myGrubBackgroundScript}";
       User = "root";
     };
   };
