@@ -15,7 +15,7 @@ The NixOS system (`nixos/`) and the home configuration (i3, polybar, screens...)
 
 ## New machine
 
-1. Install NixOS from the ISO : partition and mount the disks in `/mnt` (see [Workstation](#workstation)), then generate the hardware configuration : `nixos-generate-config --root /mnt`.
+1. Install NixOS from the ISO, as root (`sudo -i` : nix refuses a git repository owned by another user) : partition and mount the disks in `/mnt` (see [Workstation](#workstation)), then generate the hardware configuration : `nixos-generate-config --root /mnt`.
 2. Clone this repository and add the machine : copy `nixos/hosts/nixos/` as `nixos/hosts/<hostname>/`, replace its `hardware-configuration.nix` by `/mnt/etc/nixos/hardware-configuration.nix`, adapt `default.nix` (user name, keyboard, encryption, and `networking.hostName = "<hostname>";` if it isn't `nixos`), add the host in `nixos/flake.nix`, then `git add` the new files (a flake only sees the files known by git).
 3. Install : `sudo nixos-install --flake ./nixos#<hostname>`, then reboot.
 4. Clone the repository in `~/Documents/github/dotfiles` and run `./install.sh` (an existing file is kept as `.bak`).
