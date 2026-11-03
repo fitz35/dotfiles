@@ -66,12 +66,8 @@ cleaning_and_create_folder $assets_folder
 
 # greenclip
 greenclip_config_file="$home_directory.config/greenclip.toml"
-xinitrc_file="$home_directory/.xinitrc"
 if test -e "$greenclip_config_file"; then
     rm $greenclip_config_file
-fi
-if test -e "$xinitrc_file"; then
-    rm $xinitrc_file
 fi
 
 
@@ -88,7 +84,6 @@ cp -r "$repo_dir"/assets/* $assets_folder
 # greenclip
 echo "ln greenclip configuration files..."
 ln -sf "$repo_dir/greenclip/greenclip.toml" $greenclip_config_file
-ln -sf "$repo_dir/greenclip/.xinitrc" $xinitrc_file
 
 
 # my_script
@@ -106,11 +101,3 @@ bash "$script_dir/polybar_config.sh" $home_directory
 # openvpn
 echo "cp openvpn configuration files..."
 bash "$script_dir/openvpn_config.sh" $home_directory
-
-# home manager
-#echo "cp home manager configuration files..."
-#bash "$script_dir/home_manager_config.sh" $home_directory
-
-# awesome
-echo "cp awesome configuration files..."
-bash "$script_dir/awesome_config.sh" $home_directory
