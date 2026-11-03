@@ -220,6 +220,8 @@ bindsym --whole-window $mod+shift+Tab workspace prev_on_output
 # to identify the class of the window : xprop 
 # then click on the window
 assign [class="Thunderbird"] $ws1
+# the calendar reminders of thunderbird are a dialog : tiled (resized), its buttons don't react to the clicks
+for_window [class="(?i)thunderbird" window_role="AlarmWindow"] floating enable
 assign [class="(?i)firefox"] $ws2
 assign [class="obsidian"] $ws4
 assign [class="discord"] $ws5
