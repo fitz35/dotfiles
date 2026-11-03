@@ -1,69 +1,80 @@
 # The applications : the ones of the user, then the system tools. Search one : nix search nixpkgs <name>
-# (the tools of the desktop, like rofi or waybar, are in desktop.nix ; the per-project tools go in a flake dev shell)
+# (the tools of the desktop, like rofi or waybar, are in desktop.nix ; the per-project tools, like LaTeX or a
+# compiler version, go in a flake dev shell of the project)
 { config, lib, pkgs, myConf, ... }:
 
 {
   users.users.${myConf.USER_NAME}.packages = with pkgs; [
+    # web and mail
     firefox
     chromium
     thunderbird
+
+    # code
     vscode
     zed-editor
-    tree
-    zotero
-    discord
-    unzip
-    nautilus # file manager
-    evince
-    libreoffice
-    spotify
-    zoom-us # video conference
-
-    inkscape # image viewer
-
-    simplescreenrecorder # screen recorder
-
-    vlc # video player
-
-    kdePackages.okular # pdf viewer
-
-    obsidian # note taking
-
     warp-terminal
 
+    # notes and documents
+    obsidian
+    zotero
+    libreoffice
     xmind
+    evince # pdf
+    kdePackages.okular # pdf (annotations)
 
-    texliveFull
+    # communication
+    discord
+    zoom-us
 
-    cups # printer
+    # media
+    spotify
+    vlc
+    inkscape # vector drawing
+    simplescreenrecorder # screen recorder (X only : works in i3, not in sway)
+
+    # files
+    nautilus
+    unzip
+    tree
+
+    # system
     lshw # hardware info
-    iotop # list process with high io usage
+    iotop # the processes with a high io usage
   ];
 
   environment.systemPackages = with pkgs; [
+    # editors (vim : always there to fix a config)
     vim
-    wget
     gedit
+
+    # command line
     git
     git-lfs
+    wget
     htop
-    fastfetch # neofetch replacement (neofetch was removed in 26.05)
-    networkmanagerapplet
-    openconnect # vpn (also used by ~/Documents/certificat/inria-intern/connect_to_vpn.sh, until it's retired)
+    fastfetch
+    lsof # the open files
+    usbutils # lsusb
     openssl
-    direnv
-    gcc
-    usbutils
-    appimage-run
-    gparted
-    python3 # scripting (add no packages here, use dev shell instead)
-    lsof # list open files
 
-    # open xdg utilities (open default app for exemple), the portals are in xdg.portal
+    # network
+    networkmanagerapplet # nm-applet (sway and i3)
+    openconnect # vpn (also used by ~/Documents/certificat/inria-intern/connect_to_vpn.sh, until it's retired)
+
+    # dev (the rest in the dev shells of the projects)
+    gcc
+    python3 # scripting (no python packages here)
+    appimage-run
+
+    # disks
+    gparted
+
+    # desktop integration (open the default app...), the portals are in desktop.nix
     xdg-utils
     xdg-launch
 
-    mesa # opengl
+    # graphics check (glxinfo, glxgears)
     mesa-demos
   ];
 }

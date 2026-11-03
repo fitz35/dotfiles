@@ -79,7 +79,7 @@ Out of scope : changing what the commands do (except vpn_menu), the uptime analy
 
 ## Status
 - [x] Step 1 : remove the GNOME desktop, keep its useful pieces explicitly
-- [ ] Step 2 : remove the unused / dead packages
+- [x] Step 2 : remove the unused / dead packages
 - [ ] Step 3 : hardware (NVIDIA off, firmware updates, Intel thermal and video decoding)
 - [ ] Step 4 : SSH only through Tailscale, keys only
 - [x] Step 5 : split configuration.nix into commented modules (no behaviour change, done first : proven by an identical system)
