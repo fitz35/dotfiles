@@ -534,6 +534,8 @@ in
 
   # Enable Tailscale (https://tailscale.com/)
   services.tailscale.enable = true;
+  # the user can run tailscale up / down without sudo (my_script vpn_menu)
+  services.tailscale.extraSetFlags = [ "--operator=${myConf.USER_NAME}" ];
 
 
   # Open ports in the firewall.
