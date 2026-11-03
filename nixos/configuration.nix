@@ -2,22 +2,24 @@
 # your system.  Help is available in the configuration.nix(5) man page
 # and in the NixOS manual (accessible by running `nixos-help`).
 
-{ config, lib, pkgs, inputs, options, ... }:
+# myConf (user name, keyboard...) comes from hosts/<hostname>/default.nix
+{ config, lib, pkgs, inputs, options, myConf, ... }:
 
 let
   # efi mount point :
   EFI_MOUNTPOINT = "/boot/efi";
-  # windows mount point :
-  WINDOWS_MOUNTPOINT = "/mnt/windows";
 
   # my_script
   my_script = inputs.my_personnal_script.packages.x86_64-linux.default;
 
-  # script to pick a login background at each boot (randomly choose an image from /etc/nixos/login_images/)
+  # login background images, from this repository
+  LOGIN_IMAGES = ../assets/login_images;
+  # the login background displayed by the patched gnome-shell (see the overlay)
+  LOGIN_BACKGROUND = "/var/lib/login-background/background.png";
+  # script to pick a login background at each boot (randomly choose one of the login images)
   myLoginScript = pkgs.writeShellScript "my-login-script.sh" ''
-    # Select a random image from /etc/nixos/login_images/ and copy it to /etc/nixos/background.png
-    IMG=$(ls /etc/nixos/login_images/ | shuf -n 1)
-    cp "/etc/nixos/login_images/$IMG" "/etc/nixos/background.png"
+    IMG=$(ls "${LOGIN_IMAGES}" | shuf -n 1)
+    cp "${LOGIN_IMAGES}/$IMG" "${LOGIN_BACKGROUND}"
   '';
   # script to pick a grub background at each boot (randomly choose a minegrub background, shown at the next boot)
   # nixos-rebuild copies the theme in /boot/theme, with the background chosen in the minegrub-theme options
@@ -50,15 +52,10 @@ let
   # hashed password
   #mkpasswd -m sha-512
   USER_HASHED_PASSWORD = "$6$bIx/kUybHUmZ.QMQ$VimchBjbSHObo3MdTcmf3rqAax/QdVWzofy8epjnSilKzKUUlMr5fE34q/f903023PQYUsXYwCJ/igeWw8k.y1";
-  # pc relative config (named myConf to not shadow the module "config" argument)
-  myConf = import ./config_nix.nix;
 in
 {
-  imports =
-    [ # Include the results of the hardware scan.
-      ./hardware-configuration.nix
-    ];
-    
+  # the results of the hardware scan are imported by hosts/<hostname>/default.nix
+
   # ------------------------------------------
   # Bootloader
   # ------------------------------------------
@@ -103,7 +100,10 @@ in
   # File system
   # ------------------------------------------
   
-  # See hardware_configuration.nix !!!!!!!!
+  # See hosts/<hostname>/hardware-configuration.nix
+
+  # /bin/bash for the scripts using #!/bin/bash (nixos only provides /bin/sh)
+  systemd.tmpfiles.rules = [ "L+ /bin/bash - - - - /run/current-system/sw/bin/bash" ];
 
   # ------------------------------------------
   # Divers setup
@@ -163,8 +163,7 @@ in
       {
         wmName = "gnome-i3";
         wmLabel = "Gnome + i3";
-        # generate the config before starting i3, else i3 loads the config of the previous screens
-        wmCommand = ''sh /home/${myConf.USER_NAME}/.config/i3/generate_i3_config.sh; exec i3'';
+        wmCommand = "i3"; # the screens are set by the sessionCommands, as for the i3 session
         enableGnomePanel = false;
       }
     ];
@@ -174,6 +173,11 @@ in
 
   services.xserver = {
     enable = true;
+    # at login, before the window manager : apply the autorandr profile and write the i3 screens
+    # (i3/screens.conf), else i3 starts with the screens of the previous session
+    displayManager.sessionCommands = ''
+      ${pkgs.python3}/bin/python3 /home/${myConf.USER_NAME}/.config/i3/screen_management.py -e
+    '';
     xkb.layout = "${myConf.KEYBOARD_LAYOUT}";
     xkb.options = "eurosign:e,caps:escape";
 
@@ -181,7 +185,6 @@ in
       enable = true;
 
       extraPackages = with pkgs; [
-        i3status
         dmenu
         (polybar.override { i3Support = true; pulseSupport = true;})
         gnome-keyring # password management
@@ -198,13 +201,10 @@ in
         zscroll # polybar
 
         xss-lock # screen saver
-        xautolock # screen saver
         
         i3lock-color
         brightnessctl
         my_script
-
-        python3
       ];
     };
   };
@@ -227,7 +227,6 @@ in
     gnome-music
     epiphany # web browser
     geary # email reader
-    evince # document viewer
     gnome-characters
     totem # video player
     tali # poker game
@@ -271,8 +270,7 @@ in
     #jack.enable = true;
   };
 
-  # login background
-
+  # login background : gnome-shell patched to display LOGIN_BACKGROUND (changed at each boot by my-login-script)
  nixpkgs = {
   overlays = [
     (self: super: {
@@ -280,7 +278,7 @@ in
       gnome-shell = super.gnome-shell.overrideAttrs (old: {
         patches = (old.patches or []) ++ [
           (let
-            bg = "/etc/nixos/background.png";
+            bg = LOGIN_BACKGROUND;
           in super.pkgs.writeText "bg.patch" ''
             --- a/data/theme/gnome-shell-sass/widgets/_login-lock.scss
             +++ b/data/theme/gnome-shell-sass/widgets/_login-lock.scss
@@ -308,6 +306,7 @@ in
       Type = "oneshot";
       ExecStart = "${myLoginScript}";
       User = "root";
+      StateDirectory = "login-background"; # creates /var/lib/login-background
     };
   };
 
@@ -358,7 +357,6 @@ in
       libreoffice
       spotify
       zoom-us # video conference
-      playerctl # media keys
 
       inkscape # image viewer
 
@@ -369,8 +367,6 @@ in
       kdePackages.okular# pdf viewer
 
       openvpn
-
-      my_script
 
       obsidian # note taking
 
@@ -415,11 +411,8 @@ in
     python3 # scripting (add no packages here, use dev shell instead)
     lsof # list open files
 
-    # open xdg utilities (open default app for exemple)
+    # open xdg utilities (open default app for exemple), the portals are in xdg.portal
     xdg-utils
-    xdg-desktop-portal
-    xdg-desktop-portal-gtk
-    xdg-desktop-portal-gnome
     xdg-launch
   
 
@@ -479,10 +472,7 @@ in
   virtualisation.docker.enable = true;
 
   # direnv and .envrc (https://github.com/nix-community/nix-direnv)
-  programs.direnv.enable = true;
-  programs.bash.shellInit = ''
-    eval "$(direnv hook bash)"
-  ''; # add direnv to bashrc
+  programs.direnv.enable = true; # also adds the direnv hook to bash
 
   # Enable the SSH agent
   programs.ssh.startAgent = true;
@@ -493,7 +483,7 @@ in
   # autorandr (screen management)
   services.autorandr.enable = true;
   
-  # Enable polkit (https://nixos.wiki/wiki/Polkit) to use sway
+  # Enable polkit (https://nixos.wiki/wiki/Polkit) : privileges for the GUI apps (disks, network...)
   security.polkit.enable = true;
 
   # Enable Tailscale (https://tailscale.com/)

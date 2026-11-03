@@ -1,4 +1,4 @@
-# flake.nix for /etc/nixos/
+# NixOS configuration, built from this repository : sudo nixos-rebuild switch --flake .#<hostname>
 {
   description = "Custom Clement's NixOS configuration";
 
@@ -18,13 +18,14 @@
     };
 
   outputs = {nixpkgs, ...} @ inputs: {
-    # replace whatever comes after nixosConfigurations with your hostname.
-    # My laptop configuration
+    # one entry per machine, named after its hostname (nixos-rebuild picks it automatically)
+    # the machine specific part (hardware, user name...) is in hosts/<hostname>/
     nixosConfigurations.nixos = nixpkgs.lib.nixosSystem {
       system = "x86_64-linux";
       modules = [
-        { _module.args.inputs = inputs; } # pass "inputs" to configurtion.nix, making available myscript into the configuration
+        { _module.args.inputs = inputs; } # pass "inputs" to configuration.nix, making available myscript into the configuration
         ./configuration.nix
+        ./hosts/nixos # the standard work station
         inputs.minegrub-theme.nixosModules.default
       ];
     };
