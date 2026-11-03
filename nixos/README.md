@@ -9,6 +9,7 @@ The system is built directly from this folder (a flake, with its `flake.lock`) :
 | `hosts/<hostname>/` | the machine specific part : `hardware-configuration.nix` (generated) and `default.nix` (user name, keyboard, encryption) |
 | `update_config.sh` | `nixos-rebuild switch` for this machine (picked by its hostname) |
 | `flake_update.sh` | update `flake.lock` (then run `update_config.sh`) |
+| `nas.nix`, `nas_setup.sh` | the NAS shares through Tailscale ; their private values are generated in `/etc/nixos/nas-private.nix` by `nas_setup.sh` |
 
 > WARN : stay on the stable release (`nixos-XX.YY`), not unstable.
 
@@ -42,6 +43,15 @@ To use effectively zotero in nixos, we must follow [these](https://nixos.wiki/wi
 
 - GDM : gnome-shell is patched (overlay in `configuration.nix`, see [here](https://discourse.nixos.org/t/unable-to-change-background-in-gdm/33563/4)) to display `/var/lib/login-background/background.png`, a random image of `assets/login_images/` chosen at each boot.
 - grub : a random [minegrub](https://github.com/Lxtharia/minegrub-theme) background is chosen at each boot, for the next one.
+
+# NAS
+
+`nas.nix` mounts the NAS's Samba shares in `/mnt/nas/<share>` through Tailscale (direct at home, through Tailscale away) : mounted when first opened, unmounted after 10 idle minutes, an error after ~10 s if the NAS is unreachable, and unmounted at once when Tailscale is turned off. Its address and shares stay out of this public repository, in `/etc/nixos/nas-private.nix` (that's why the rebuild is `--impure`), generated once per machine with Tailscale on :
+
+```shell
+sh nixos/nas_setup.sh <tailscale name of the NAS>   # finds its address and shares, asks the sudo password
+sh nixos/update_config.sh
+```
 
 # Wifi 802.1X (inria-interne, eduroam)
 

@@ -26,6 +26,7 @@ Work in progress : [PLAN.md](PLAN.md) (my_script merged here, Inria VPN in Netwo
 5. The local secrets, not in this repository :
    - ssh key for github : generate a [key](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent) for each OS and add it to github (test : `ssh -T git@github.com`). The private ssh hosts are added in `~/.ssh/config` (copied once from `ssh/config`).
    - wifi 802.1X certificates in `/etc/nixos/wifi-certs/` (see [nixos/README.md](nixos/README.md#wifi-8021x-inria-interne-eduroam)).
+   - NAS : `sh nixos/nas_setup.sh <tailscale name of the NAS>` once Tailscale is logged in (see [nixos/README.md](nixos/README.md#nas)).
    - vpn : create the NetworkManager connection once with `nm-connection-editor` (Inria : AnyConnect, gateway `vpn.inria.fr/all`, CA certificate kept outside the repository), the password is saved in the keyring.
    - screens : add the new screen setups to `kanshi/config` (sway) and autorandr (i3), see [i3/README.md](i3/README.md#multiscreen).
 

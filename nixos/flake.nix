@@ -23,6 +23,7 @@
         { _module.args.inputs = inputs; } # pass "inputs" to configuration.nix (minegrub)
         ./configuration.nix
         ./hosts/nixos # the standard work station
+        ./nas.nix # the NAS shares through tailscale (private values in /etc/nixos/nas-private.nix)
         inputs.minegrub-theme.nixosModules.default
       ];
     };
