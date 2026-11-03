@@ -43,16 +43,21 @@ in
       after = [ "tailscaled.service" ];
       wantedBy = [ "multi-user.target" ];
       path = [ config.services.tailscale.package pkgs.jq pkgs.util-linux ];
+      # NixOS scripts stop at the first error : the unmount commands never fail the loop, and it restarts anyway
+      serviceConfig = { Restart = "always"; RestartSec = 5; };
       script = ''
         while sleep 5; do
-          if [ "$(tailscale status --json 2>/dev/null | jq -r .BackendState)" != "Running" ]; then
-            ${lib.concatMapStringsSep "\n" (share: ''
-              if systemctl -q is-active ${mountUnit share}; then
-                echo "tailscale is off : unmounting ${mountPath share}"
-                # a file still open makes it busy : then detach it anyway (the automount below stays armed)
-                systemctl stop ${mountUnit share} || umount --lazy --force ${mountPath share}
-              fi'') nas.shares}
-          fi
+          case "$(tailscale status --json 2>/dev/null | jq -r .BackendState)" in
+            # on, or reconnecting (network change) : keep the shares
+            Running|Starting) continue ;;
+          esac
+          ${lib.concatMapStringsSep "\n" (share: ''
+            # only a real share (cifs), not the automount point below it
+            if findmnt --types cifs --mountpoint ${mountPath share} > /dev/null; then
+              echo "tailscale is off : unmounting ${mountPath share}"
+              # a file still open makes it busy : then detach it anyway (the automount below stays armed)
+              systemctl stop ${mountUnit share} || umount --lazy --force ${mountPath share} || true
+            fi'') nas.shares}
         done
       '';
     };
