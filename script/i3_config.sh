@@ -22,5 +22,21 @@ mkdir -p "$autorandr_config_folder"
 ln -sf "$repo_dir/i3/autorandr_postswitch.sh" "$autorandr_config_folder/postswitch"
 chmod +x "$repo_dir/i3/autorandr_postswitch.sh"
 
+# autorandr profiles (linked, so autorandr --save <profile> --force updates the repo)
+for profile in "$repo_dir/i3/autorandr/"*/; do
+    profile_name="$(basename "$profile")"
+    target="$autorandr_config_folder/$profile_name"
+    # replace a local copy of the profile only if it is the same as the repo one
+    if [ -d "$target" ] && [ ! -L "$target" ]; then
+        if diff -rq "$target" "$profile" > /dev/null; then
+            rm -r "$target"
+        else
+            echo "Warning: $target differs from the repo profile, not linked"
+            continue
+        fi
+    fi
+    ln -sfn "$repo_dir/i3/autorandr/$profile_name" "$target"
+done
+
 
 cp -n "$repo_dir/i3/i3.env.bk" "$i3_config_folder/i3.env"
