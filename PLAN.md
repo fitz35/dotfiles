@@ -72,3 +72,52 @@ Once Sway is your daily session : polybar, autorandr + xrandr path of screen_man
 - Each phase committed; pushes only when you ask. Privacy rules checked before each push (no certs, no NAS hosts, password hash untouched; the VPN CA files stay in `~/Documents/certificat/`).
 
 Out of scope : changing what the commands do (except vpn_menu), the uptime analysis itself.
+
+---
+
+# NixOS config : cleanup and refactor (2026-11-03)
+
+## Status
+- [ ] Step 1 : remove the GNOME desktop, keep its useful pieces explicitly
+- [ ] Step 2 : remove the unused / dead packages
+- [ ] Step 3 : hardware (NVIDIA off, firmware updates, Intel thermal and video decoding)
+- [ ] Step 4 : SSH only through Tailscale, keys only
+- [ ] Step 5 : split configuration.nix into commented modules (no behaviour change)
+- [ ] Step 6 : your checks after the switch (list below)
+
+## Diagnostic
+Machine : Dell Precision 3581, i7-13700H, Intel Raptor Lake GPU (all the outputs : laptop, DP, HDMI, dock), NVIDIA RTX A1000 (no output, free nouveau driver, suspended when idle), WiFi / Bluetooth Intel AX211, Thunderbolt dock (bolt), no fingerprint reader. System : 25.8 GB.
+
+| Finding | Measure | Decision |
+|---|---|---|
+| GNOME desktop + "Gnome + i3" flashback session | never ran as the user (journal : only GDM, i3, sway) ; 88 packages, ~0.5 GB, services avahi, geoclue, orca, ibus, evolution | remove ; keep GDM (its gnome-shell, patched for the background), keyring, gvfs, bolt, upower, power-profiles-daemon, udisks, dconf, explicitly |
+| gnome-tweaks | 2.3 GB, only for the GNOME desktop | remove |
+| texliveFull | 6.2 GB | remove (a LaTeX project can bring its own texlive in a flake dev shell) |
+| cups package | no printing service enabled : the package alone does nothing | remove (enable `services.printing` the day a printer is needed) |
+| xdg-desktop-portal-gnome | needs a running gnome-shell session : useless in sway / i3 | remove (gtk + wlr portals stay) |
+| mesa in systemPackages and graphics.extraPackages | mesa is already the default driver | remove ; add intel-media-driver (hardware video decoding : battery when watching videos) |
+| NVIDIA | no output, compute only, not used | blacklist nouveau + let the kernel power the driverless card down (udev power/control=auto) ; check it stays suspended |
+| firmware | fwupd off | enable fwupd (Dell BIOS, dock WD22TB4 firmware : may fix its boot display issue) ; updates stay manual (`fwupdmgr update`) |
+| thermal | thermald off | enable (Intel laptop : avoids hard throttling) |
+| SSH server | open on every network, password logins | only on tailscale0, keys only, no root login |
+| readability | one 560-line file, template comments | modules by topic, one comment per choice ; the users block (password) moved unchanged |
+
+## Steps (each : build, closure diff, commit)
+1. **GNOME** : `services.desktopManager.gnome` and its `flashback.customSessions` off ; explicit : `services.gnome.gnome-keyring` (+ unlock at the GDM login), `services.gvfs`, `services.hardware.bolt`, `services.upower`, `services.power-profiles-daemon`, `services.udisks2`, `programs.dconf` ; drop `environment.gnome.excludePackages`, `services.gnome.gcr-ssh-agent`, gnome-tweaks, the gnome portal.
+2. **Packages** : texliveFull, cups, the duplicates (python3, playerctl, mesa...) ; group the rest by purpose with a comment each.
+3. **Hardware** (in `hosts/nixos/default.nix`, machine specific) : `boot.blacklistedKernelModules = [ "nouveau" ]` + udev rule power/control=auto on the NVIDIA device ; `services.fwupd`, `services.thermald` ; `hardware.graphics.extraPackages = [ intel-media-driver ]`.
+4. **SSH** : `openFirewall = false`, port 22 open on `tailscale0` only, `PasswordAuthentication = false`, `KbdInteractiveAuthentication = false`, `PermitRootLogin = "no"` ; the authorized keys stay in `~/.ssh/authorized_keys`.
+5. **Refactor** : `configuration.nix` (imports, users unchanged, stateVersion) + `modules/boot.nix` (grub, minegrub, backgrounds), `modules/desktop.nix` (GDM, sway, i3, portals, fonts, sound, notifications), `modules/services.nix` (network, VPN, ssh, tailscale, docker, dev tools), `modules/packages.nix` (apps by purpose). Checked : same system as before the split (identical store path).
+
+## Your checks after `sh nixos/update_config.sh` and a reboot (Step 6)
+- [ ] GDM : the random background, num lock ; the Sway and i3 sessions start
+- [ ] keyring unlocked at login : `vpn inria` connects without asking the password again
+- [ ] dock : screens up, `boltctl list` shows it authorized
+- [ ] waybar battery, `powerprofilesctl` answers, `systemctl status thermald`
+- [ ] nautilus : trash, a USB key (gvfs, udisks)
+- [ ] notifications, the polkit password prompt (e.g. gparted), a screen share
+- [ ] NVIDIA : `cat /sys/bus/pci/devices/0000:01:00.0/power/runtime_status` = suspended ; on battery, `upower -i $(upower -e | grep BAT)` energy-rate, compared with before (note it before the switch)
+- [ ] video decoding : `nix shell nixpkgs#libva-utils -c vainfo` lists the iHD driver
+- [ ] firmware : `fwupdmgr get-devices` lists the BIOS and the dock
+- [ ] ssh : from another Tailscale machine with a key ; refused with a password ; port 22 closed on the wifi
+- [ ] system size : `nix path-info -S /run/current-system`
