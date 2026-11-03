@@ -251,6 +251,8 @@ bindsym $mod+Mod1+1 move workspace to output $screen_2
 bindsym $mod+Mod1+eacute move workspace to output $screen_1
 bindsym $mod+Mod1+3 move workspace to output $screen_3
 bindsym $mod+Mod1+4 move workspace to output next
+# move all the workspaces back to their assigned screen
+bindsym $mod+Mod1+r exec python3 $i3_config_folder/rearrange_workspaces.py
 
 
 # rolling :
