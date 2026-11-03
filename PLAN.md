@@ -3,7 +3,7 @@
 ## Status
 - [x] Phase 0 : plan saved in the repo
 - [x] Phase 1 : my_script inside dotfiles, same behaviour
-- [ ] Phase 2 : polybar timers without polling
+- [x] Phase 2 : polybar timers without polling
 - [ ] Phase 3 : Inria VPN through NetworkManager
 - [ ] Phase 4 : my_script works on X and Wayland
 - [ ] Phase 5 : Sway session next to i3

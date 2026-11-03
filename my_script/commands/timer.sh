@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
-# Countdown of the polybar timer module : `my_script timer <add [seconds]|toggle|reset|display>`
+# Countdown of the polybar timer module : `my_script timer <add [seconds]|toggle|reset|display|watch>`
 # add : add (or remove, if negative) seconds to the countdown (1 by default, polybar scroll uses +5 / -5),
-# toggle : start / pause, reset : back to BASE_TIME, display : print MM:SS, then blink END / !-! when finished.
+# toggle : start / pause, reset : back to BASE_TIME, display : print MM:SS, then blink END / !-! when finished,
+# watch : display every second (polybar).
 # The state is kept in /tmp files, so it is lost at reboot.
 
 BASE_TIME=60 # in seconds
@@ -123,5 +124,12 @@ case "$1" in
             echo "A problem occured"
             exit 1
         fi
+        ;;
+    watch)
+        # display every second, for polybar (tail = true) : one process instead of one my_script call per second
+        while true; do
+            echo "$(bash "$0" display)"
+            sleep 1
+        done
         ;;
 esac

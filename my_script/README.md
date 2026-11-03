@@ -8,8 +8,8 @@ my_script <command> [arguments]
 
 | Command | Called by | Description |
 |---|---|---|
-| `chronometer <toggle\|reset\|display>` | polybar | stopwatch |
-| `timer <add [s]\|toggle\|reset\|display>` | polybar | countdown (60s by default, scroll ±5s) |
+| `chronometer <toggle\|reset\|display\|watch>` | polybar (`watch`) | stopwatch |
+| `timer <add [s]\|toggle\|reset\|display\|watch>` | polybar (`watch`) | countdown (60s by default, scroll ±5s) |
 | `uptime [-display_entry]` | polybar | daily time spent on the computer, saved in `~/daily_uptime.txt` (analysed in [my_personnal_script](https://github.com/fitz35/my_personnal_script)) |
 | `github_menu <code\|terminal>` | i3 `$mod+t` / `$mod+Alt+t` | open a project folder (`PARENT_FOLDERS` / `HAND_PICKED_FOLDERS`) in vscode (inside `nix develop` if it has a flake) or kitty |
 | `vpn_menu` | i3 `$mod+w` | start a vpn / ssh connection in kitty |
