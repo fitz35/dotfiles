@@ -20,26 +20,6 @@
         "type": "github"
       }
     },
-    "my_personnal_script": {
-      "inputs": {
-        "nixpkgs": [
-          "nixpkgs"
-        ]
-      },
-      "locked": {
-        "lastModified": 1793627524,
-        "narHash": "sha256-bBDrfkhRQYUU1V6uPjyg0Cxx1Q2Jo3SoIQY5rqQSn6w=",
-        "owner": "fitz35",
-        "repo": "my_personnal_script",
-        "rev": "506540f03659fb98105cc773fd05bd2fb173248d",
-        "type": "github"
-      },
-      "original": {
-        "owner": "fitz35",
-        "repo": "my_personnal_script",
-        "type": "github"
-      }
-    },
     "nixpkgs": {
       "locked": {
         "lastModified": 1793526781,
@@ -59,7 +39,6 @@
     "root": {
       "inputs": {
         "minegrub-theme": "minegrub-theme",
-        "my_personnal_script": "my_personnal_script",
         "nixpkgs": "nixpkgs"
       }
     }

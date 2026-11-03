@@ -1,3 +1,3 @@
 # Greenclip
 
-Clipboard manager [here](https://github.com/erebe/greenclip). See [here](git@github.com:fitz35/my_personnal_script.git) to more detail on the usage in my_script.
+Clipboard manager [here](https://github.com/erebe/greenclip). Used by `my_script greenclip` (i3 `$mod+v`, see [my_script](../my_script/README.md)).

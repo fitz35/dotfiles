@@ -61,9 +61,6 @@ bindsym $mod+Escape exec $my_script logout_menu
 
 bindsym $mod+w exec $my_script vpn_menu
 
-# start manage disk
-bindsym $mod+u exec $my_script manage_disk
-
 # the power button must be captured in logind (see the doc)
 bindsym --release XF86PowerOff exec $my_script logout_menu
 

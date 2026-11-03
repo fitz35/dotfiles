@@ -1,5 +1,5 @@
 {
-	// open both repositories together : the dotfiles (nixos, i3, polybar...) and the scripts they call (my_script)
+	// open both repositories together : the dotfiles (nixos, i3, polybar, my_script...) and the uptime analysis (my_personnal_script)
 	"folders": [
 		{
 			"name": "dotfiles",

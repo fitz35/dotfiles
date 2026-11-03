@@ -12,7 +12,7 @@ Repo [here](https://github.com/PrayagS/polybar-spotify/tree/master). Dependencie
 
 # My_script
 
-[here](https://github.com/fitz35/my_personnal_script) are my personnal script. Packaged with nixos.
+The timer, chronometer, uptime and power modules call [my_script](../my_script/README.md), packaged by nixos.
 
 # Fonts
 

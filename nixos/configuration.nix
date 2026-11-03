@@ -9,8 +9,8 @@ let
   # efi mount point :
   EFI_MOUNTPOINT = "/boot/efi";
 
-  # my_script
-  my_script = inputs.my_personnal_script.packages.x86_64-linux.default;
+  # my_script : the commands of i3 and polybar, from this repository (../my_script/)
+  my_script = pkgs.callPackage ../my_script { };
 
   # login background images, from this repository
   LOGIN_IMAGES = ../assets/login_images;
@@ -354,9 +354,8 @@ in
     home = "/home/${myConf.USER_NAME}";       # Home directory path
     createHome = false;        # Don't create the home directory since it's a mount point
     # wheel : Enable ‘sudo’ for the user, 
-    # disk : allow the user to use mount (command udisksctl)
     # docker : allow the user to use docker
-    extraGroups = [ "wheel" "disk" "docker" "networkmanager" ]; 
+    extraGroups = [ "wheel" "docker" "networkmanager" ]; 
     #mkpasswd -m sha-512
     hashedPassword = "${USER_HASHED_PASSWORD}";
 

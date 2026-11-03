@@ -10,7 +10,8 @@ Work in progress : [PLAN.md](PLAN.md) (my_script merged here, Inria VPN in Netwo
 | `i3/` | i3 config, screen management (autorandr profiles, workspaces per screen) |
 | `polybar/` | the bar |
 | `assets/` | wallpapers (`background_image/`) and login backgrounds (`login_images/`) |
-| `fonts/`, `greenclip/`, `dunst/`, `my_script/` | custom font, clipboard manager config, notifications style, [my_script](https://github.com/fitz35/my_personnal_script) config |
+| `my_script/` | the commands of i3 and polybar (rofi menus, lock, wallpaper, polybar modules), installed by nixos |
+| `fonts/`, `greenclip/`, `dunst/` | custom font, clipboard manager config, notifications style |
 | `ssh/`, `openvpn/` | ssh hosts and vpn connections (secrets stay local) |
 | `nix/` | dev shells (python, swh mining) |
 | `install.sh` | links the home configuration in `~` |

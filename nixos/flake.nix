@@ -12,9 +12,6 @@
       # official repo (the splash customization was fixed in https://github.com/Lxtharia/minegrub-theme/pull/35, no need of the 0nyr fork anymore)
       minegrub-theme.url = "github:Lxtharia/minegrub-theme";
       minegrub-theme.inputs.nixpkgs.follows = "nixpkgs"; # use our stable nixpkgs instead of its pinned unstable one
-    
-      my_personnal_script.url = "github:fitz35/my_personnal_script";
-      my_personnal_script.inputs.nixpkgs.follows = "nixpkgs";
     };
 
   outputs = {nixpkgs, ...} @ inputs: {
@@ -23,7 +20,7 @@
     nixosConfigurations.nixos = nixpkgs.lib.nixosSystem {
       system = "x86_64-linux";
       modules = [
-        { _module.args.inputs = inputs; } # pass "inputs" to configuration.nix, making available myscript into the configuration
+        { _module.args.inputs = inputs; } # pass "inputs" to configuration.nix (minegrub)
         ./configuration.nix
         ./hosts/nixos # the standard work station
         inputs.minegrub-theme.nixosModules.default
