@@ -207,6 +207,9 @@ in
         zscroll # polybar
 
         xss-lock # screen saver
+        dunst # notifications (started by D-Bus at the first one, see services.dbus.packages)
+        libnotify # notify-send
+        polkit_gnome # password prompt of the GUI apps needing root (started by i3)
         
         i3lock-color
         brightnessctl
@@ -507,6 +510,10 @@ in
   
   # Enable polkit (https://nixos.wiki/wiki/Polkit) : privileges for the GUI apps (disks, network...)
   security.polkit.enable = true;
+
+  # notifications : dunst is started by D-Bus at the first notification (config : dunst/dunstrc of the repo)
+  services.dbus.packages = [ pkgs.dunst ];
+  systemd.packages = [ pkgs.dunst ];
 
   # Enable Tailscale (https://tailscale.com/)
   services.tailscale.enable = true;

@@ -1,0 +1,42 @@
+# dunst (notifications), linked as ~/.config/dunst/dunstrc by install.sh. Colors and font of the polybar.
+# reload after a change : dunstctl reload ; test : notify-send "title" "body"
+
+[global]
+    # on the focused screen, top right, under the polybar
+    follow = keyboard
+    origin = top-right
+    offset = (10, 45)
+    width = (250, 400)
+    notification_limit = 5
+
+    font = JetBrainsMono Nerd Font 11
+    padding = 10
+    horizontal_padding = 12
+    frame_width = 2
+    separator_color = frame
+    corner_radius = 0
+    icon_position = left
+    max_icon_size = 48
+
+    # left click : close, middle : open the action menu (needs dmenu), right : close all
+    mouse_left_click = close_current
+    mouse_middle_click = do_action, close_current
+    mouse_right_click = close_all
+
+[urgency_low]
+    background = "#1c2128"
+    foreground = "#707880"
+    frame_color = "#2d333b"
+    timeout = 5
+
+[urgency_normal]
+    background = "#1c2128"
+    foreground = "#adbac7"
+    frame_color = "#ff8700"
+    timeout = 10
+
+[urgency_critical]
+    background = "#1c2128"
+    foreground = "#adbac7"
+    frame_color = "#d7005f"
+    timeout = 0

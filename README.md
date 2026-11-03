@@ -8,7 +8,7 @@ The NixOS system (`nixos/`) and the home configuration (i3, polybar, screens...)
 | `i3/` | i3 config, screen management (autorandr profiles, workspaces per screen) |
 | `polybar/` | the bar |
 | `assets/` | wallpapers (`background_image/`) and login backgrounds (`login_images/`) |
-| `fonts/`, `greenclip/`, `my_script/` | custom font, clipboard manager config, [my_script](https://github.com/fitz35/my_personnal_script) config |
+| `fonts/`, `greenclip/`, `dunst/`, `my_script/` | custom font, clipboard manager config, notifications style, [my_script](https://github.com/fitz35/my_personnal_script) config |
 | `ssh/`, `openvpn/` | ssh hosts and vpn connections (secrets stay local) |
 | `nix/` | dev shells (python, swh mining) |
 | `install.sh` | links the home configuration in `~` |

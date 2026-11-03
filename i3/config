@@ -30,6 +30,9 @@ exec --no-startup-id dex-autostart --autostart --environment i3
 # and nm-applet is a desktop environment-independent system tray GUI for it.
 exec --no-startup-id nm-applet
 
+# password prompt of the GUI apps needing root (polkit agent, installed by nixos : nothing on fedora)
+exec --no-startup-id /run/current-system/sw/libexec/polkit-gnome-authentication-agent-1
+
 # Use pactl to adjust volume in PulseAudio.
 bindsym XF86AudioRaiseVolume exec --no-startup-id pactl set-sink-volume @DEFAULT_SINK@ +10%
 bindsym XF86AudioLowerVolume exec --no-startup-id pactl set-sink-volume @DEFAULT_SINK@ -10%
@@ -68,6 +71,10 @@ bindsym --release XF86PowerOff exec $my_script logout_menu
 # start dmenu (a program launcher)
 bindsym $mod+d exec $my_script rofi -show drun # need rofi
 bindsym $mod+Shift+d exec --no-startup-id "dmenu_run -nf '#BBBBBB' -nb '#222222' -sb '#005577' -sf '#EEEEEE' -fn 'monospace-10'"
+
+# notifications (dunst) : close the last one, show the previous ones again
+bindsym $mod+n exec --no-startup-id dunstctl close
+bindsym $mod+Shift+n exec --no-startup-id dunstctl history-pop
 
 # greenclip
 bindsym $mod+v exec --no-startup-id "$my_script greenclip"
