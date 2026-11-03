@@ -256,9 +256,9 @@ in
   # Enable CUPS to print documents.
   # services.printing.enable = true;
 
-  # Enable sound with pipewire
-  # If alsa doesnt work, make a fresh install of pulseaudio and alsa
-  # cf https://discourse.nixos.org/t/cant-get-alsa-nixos-working/644
+  # Enable sound with pipewire (pulseaudio and alsa apps go through it, pactl / pamixer are only clients)
+  # no sound but a "Dummy Output" : the card profile is "off" in ~/.local/state/wireplumber/default-profile,
+  # choose another one in pavucontrol (Configuration tab), wireplumber remembers it
   services.pulseaudio.enable = false;
   security.rtkit.enable = true;
   services.pipewire = {
@@ -334,7 +334,6 @@ in
     home = "/home/${myConf.USER_NAME}";       # Home directory path
     createHome = false;        # Don't create the home directory since it's a mount point
     # wheel : Enable ‘sudo’ for the user, 
-    # audio : allow the user to manage audio (!!!!WARN!!! it use pulseaudio, not alsa)
     # disk : allow the user to use mount (command udisksctl)
     # docker : allow the user to use docker
     extraGroups = [ "wheel" "disk" "docker" "networkmanager" ]; 
