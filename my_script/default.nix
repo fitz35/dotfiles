@@ -17,6 +17,14 @@ stdenvNoCC.mkDerivation {
 
   nativeBuildInputs = [ makeWrapper ];
 
+  # a syntax error in a command fails the build (update_config.sh) instead of a shortcut silently
+  doCheck = true;
+  nativeCheckInputs = [ python3 ];
+  checkPhase = ''
+    for script in my_script.sh lib.sh commands/*.sh; do bash -n "$script"; done
+    python3 -c 'import ast, sys; [ast.parse(open(f).read(), f) for f in sys.argv[1:]]' commands/*.py
+  '';
+
   installPhase = ''
     mkdir -p $out/libexec/my_script $out/bin
     cp -r my_script.sh lib.sh commands rofi $out/libexec/my_script/
