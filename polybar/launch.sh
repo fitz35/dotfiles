@@ -3,7 +3,8 @@
 # Terminate already running bar instances, and wait for them to quit
 polybar-msg cmd quit > /dev/null 2>&1
 for _ in $(seq 25); do
-  pgrep -u "$UID" -x polybar > /dev/null || break
+  # on nixos the process is named .polybar-wrapped (truncated to 15 characters)
+  pgrep -u "$UID" -x 'polybar|\.polybar-wrappe' > /dev/null || break
   sleep 0.2
 done
 
