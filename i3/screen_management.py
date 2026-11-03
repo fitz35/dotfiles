@@ -91,10 +91,21 @@ def parse_xrandr_output(output : str) ->Dict[str, str]:
 
     return results
 
-def get_connected_ports(output : str) -> List[str]:
-    """return the connected ports of the xrandr output, the primary one first"""
-    ports = re.findall(r'^(\S+) connected( primary)?', output, re.MULTILINE)
-    return [port for port, primary in ports if primary] + [port for port, primary in ports if not primary]
+def get_main_port(output : str) -> Optional[str]:
+    """return the main screen of the xrandr output : the primary one, else the laptop one, else the first active one"""
+    # a port is active when it has a geometry (connected [primary] 1920x1080+0+0)
+    ports = re.findall(r'^(\S+) connected( primary)?( \d+x\d+\+\d+\+\d+)?', output, re.MULTILINE)
+    is_laptop = lambda port: port.startswith(('eDP', 'LVDS'))
+    for condition in (
+        lambda port, primary, active: primary and active,
+        lambda port, primary, active: is_laptop(port) and active,
+        lambda port, primary, active: active,
+        lambda port, primary, active: True,
+    ):
+        for port, primary, active in ports:
+            if condition(port, primary, active):
+                return port
+    return None
 
 def write_screens_conf(screens_conf_path: str, changes: Dict[str, str]) -> None:
     """write the i3 screen variables, then include the workspace rules using them
@@ -127,9 +138,9 @@ if __name__ == '__main__':
 
     screen_ports: List[str] = []
     if len(choosen_profiles) == 0:
-        print("No autorandr profile detected, using the connected screens")
+        print("No autorandr profile detected, using only the main screen")
     elif choosen_profiles[0].name not in profile_config.profiles:
-        print(f"The autorandr profile {choosen_profiles[0].name} is not in {SCREEN_CONFIG}, using the connected screens")
+        print(f"The autorandr profile {choosen_profiles[0].name} is not in {SCREEN_CONFIG}, using only the main screen")
     else:
         choosen_profile_config = profile_config.profiles[choosen_profiles[0].name]
         edids = [choosen_profile_config.screen1, choosen_profile_config.screen2, choosen_profile_config.screen3]
@@ -137,11 +148,13 @@ if __name__ == '__main__':
         if all(edid in xrandr_output for edid in edids):
             screen_ports = [xrandr_output[edid] for edid in edids]
         else:
-            print(f"A screen of the profile {choosen_profiles[0].name} is not connected, using the connected screens")
+            print(f"A screen of the profile {choosen_profiles[0].name} is not connected, using only the main screen")
 
-    # fallback : the primary screen first, then the others in the xrandr order
+    # fallback : only the main screen, an unknown screen (a video projector...) never gets a workspace
+    # by itself (move one there by hand with $mod+Alt+4), save an autorandr profile to use it
     if len(screen_ports) == 0:
-        screen_ports = get_connected_ports(xrandr_output_str)[:3]
+        main_port = get_main_port(xrandr_output_str)
+        screen_ports = [main_port] if main_port else []
     if len(screen_ports) == 0:
         print("No connected screen found, keep the previous configuration")
         exit(1)
