@@ -35,7 +35,19 @@
   services.blueman.enable = true; # bluetooth manager (blueberry was removed in 26.05)
 
   # ------------------------------ SSH ------------------------------
-  services.openssh.enable = true;
+  # the ssh server : only through Tailscale (closed on the wifi / ethernet networks), with a key only ;
+  # the keys allowed to log in are in ~/.ssh/authorized_keys
+  services.openssh = {
+    enable = true;
+    openFirewall = false;
+    settings = {
+      PasswordAuthentication = false;
+      KbdInteractiveAuthentication = false;
+      PermitRootLogin = "no";
+    };
+  };
+  networking.firewall.interfaces.${config.services.tailscale.interfaceName}.allowedTCPPorts = config.services.openssh.ports;
+  # the ssh agent (ssh to the other machines : github, servers...)
   programs.ssh.startAgent = true;
 
   # ------------------------------ DISKS, PRIVILEGES ------------------------------
