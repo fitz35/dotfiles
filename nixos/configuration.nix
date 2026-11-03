@@ -134,7 +134,8 @@ in
       {
         wmName = "gnome-i3";
         wmLabel = "Gnome + i3";
-        wmCommand = ''sh /home/${myConf.USER_NAME}/.config/i3/generate_i3_config.sh & exec i3'';
+        # generate the config before starting i3, else i3 loads the config of the previous screens
+        wmCommand = ''sh /home/${myConf.USER_NAME}/.config/i3/generate_i3_config.sh; exec i3'';
         enableGnomePanel = false;
       }
     ];

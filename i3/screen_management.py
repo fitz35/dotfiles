@@ -66,26 +66,20 @@ def create_from_json(data: dict) -> AutoXrandrConfig:
    
 def parse_xrandr_output(output : str) ->Dict[str, str]:
     """return a dict with the EDID as key and the port as value"""
-    # Regex to match the port blocks
-    port_block_regex = re.compile(r'^(\S+) connected', re.MULTILINE)
-    
+    # Regex to match the port line at the start of a block
+    port_regex = re.compile(r'(\S+) connected')
+
     # Regex to find the EDID within a block
     edid_regex = re.compile(r'EDID:\s+((?:\t\t[0-9a-fA-F]+\n?)+)', re.MULTILINE)
 
     results : Dict[str, str] = {}
 
-    # Find all port blocks
-    ports = port_block_regex.findall(output)
-
-    for port in ports:
-        # Find the block for this port
-        port_start = output.find(port)
-        next_port_start = len(output)
-        for other_port in ports:
-            pos = output.find(other_port, port_start + 1)
-            if 0 < pos < next_port_start:
-                next_port_start = pos
-        port_block = output[port_start:next_port_start]
+    # Split the output in one block per port (each block starts with an unindented line).
+    # Splitting on the lines avoids matching a port name inside another one (DP-1 in eDP-1)
+    for port_block in re.split(r'^(?=\S)', output, flags=re.MULTILINE):
+        port_match = port_regex.match(port_block)
+        if not port_match:
+            continue
 
         # Search for the EDID within this block
         edid_match = edid_regex.search(port_block)
@@ -93,9 +87,14 @@ def parse_xrandr_output(output : str) ->Dict[str, str]:
             edid_raw = edid_match.group(1)
             # Clean and format the EDID data
             edid = ''.join(edid_raw.split())
-            results[edid] = port
+            results[edid] = port_match.group(1)
 
     return results
+
+def get_connected_ports(output : str) -> List[str]:
+    """return the connected ports of the xrandr output, the primary one first"""
+    ports = re.findall(r'^(\S+) connected( primary)?', output, re.MULTILINE)
+    return [port for port, primary in ports if primary] + [port for port, primary in ports if not primary]
 
 def modify_env_file(env_file_path: str, changes: Dict[str, str]) -> None:
     # Read the .env file
@@ -123,36 +122,47 @@ if __name__ == '__main__':
 
     popen = os.popen('autorandr --change').read()
     profiles = AutoXrandrOutputs.create_from_autorandr_output()
-    profile_config = create_from_json(json.load(open(SCREEN_CONFIG)))
+    with open(SCREEN_CONFIG) as screen_config_file:
+        profile_config = create_from_json(json.load(screen_config_file))
     xrandr_output_str = os.popen('xrandr --verbose').read()
     xrandr_output = parse_xrandr_output(xrandr_output_str)
 
     choosen_profiles = [profile for profile in profiles.profiles if profile.current]
     if len(choosen_profiles) == 0:
         choosen_profiles = [profile for profile in profiles.profiles if profile.detected]
-        
-    choosen_profile = choosen_profiles[0]
-    choosen_profile_name = choosen_profile.name
-    choosen_profile_config = profile_config.profiles[choosen_profile_name]
 
-    screen1_port = xrandr_output[choosen_profile_config.screen1]
-    if choosen_profile_config.screen2:
-        screen2_port = xrandr_output[choosen_profile_config.screen2]
+    screen_ports: List[str] = []
+    if len(choosen_profiles) == 0:
+        print("No autorandr profile detected, using the connected screens")
+    elif choosen_profiles[0].name not in profile_config.profiles:
+        print(f"The autorandr profile {choosen_profiles[0].name} is not in {SCREEN_CONFIG}, using the connected screens")
     else:
-        screen2_port = screen1_port
+        choosen_profile_config = profile_config.profiles[choosen_profiles[0].name]
+        edids = [choosen_profile_config.screen1, choosen_profile_config.screen2, choosen_profile_config.screen3]
+        edids = [edid for edid in edids if edid]
+        if all(edid in xrandr_output for edid in edids):
+            screen_ports = [xrandr_output[edid] for edid in edids]
+        else:
+            print(f"A screen of the profile {choosen_profiles[0].name} is not connected, using the connected screens")
 
-    if choosen_profile_config.screen3:
-        screen3_port = xrandr_output[choosen_profile_config.screen3]
-    else:
-        screen3_port = screen2_port
+    # fallback : the primary screen first, then the others in the xrandr order
+    if len(screen_ports) == 0:
+        screen_ports = get_connected_ports(xrandr_output_str)[:3]
+    if len(screen_ports) == 0:
+        print("No connected screen found, keep the previous configuration")
+        exit(1)
+
+    # a missing screen is replaced by the previous one
+    while len(screen_ports) < 3:
+        screen_ports.append(screen_ports[-1])
 
     changes = {
-        'SCREEN_1': screen1_port,
-        'SCREEN_2': screen2_port,
-        'SCREEN_3': screen3_port,
+        'SCREEN_1': screen_ports[0],
+        'SCREEN_2': screen_ports[1],
+        'SCREEN_3': screen_ports[2],
     }
     # Write the environment variables
     if args.env:
         modify_env_file(I3_ENV, changes)
-    for key, value in changes:
+    for key, value in changes.items():
         print(f"{key}={value}")
