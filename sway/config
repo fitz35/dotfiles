@@ -58,11 +58,13 @@ bindsym $mod+Shift+e exec swaynag -t warning -m 'Exit sway ? This will end your 
 # ------------------ native Wayland apps (app_id : the class rules of common.conf only match the X apps) ------------------
 # to identify the app_id of a window : swaymsg -t get_tree | grep app_id
 assign [app_id="thunderbird"] $ws1
-# the calendar reminders of thunderbird are a dialog : tiled (resized), its buttons don't react to the clicks
-for_window [app_id="thunderbird" title="(?i)reminder"] floating enable
+# the calendar reminders of thunderbird are a dialog : tiled (resized), its buttons don't react to the clicks ;
+# brought back from the workspace 1 (assign above) to the screen where I am
+for_window [app_id="thunderbird" title="(?i)reminder"] floating enable, move container to output current, focus
 assign [app_id="firefox"] $ws2
-assign [app_id="obsidian"] $ws4
+assign [app_id="md.obsidian.Obsidian"] $ws4
 assign [app_id="discord"] $ws5
+assign [app_id="spotify"] $ws11
 for_window [app_id="code" title=".* - Visual Studio Code"] move container to workspace $ws3
-for_window [app_id="obsidian" title=".*notes*."] move container to workspace $ws4
+for_window [app_id="md.obsidian.Obsidian" title=".*notes*."] move container to workspace $ws4
 for_window [app_id="code" title=".*dotfiles - Visual Studio Code"] move container to workspace $ws9

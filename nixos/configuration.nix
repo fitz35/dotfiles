@@ -231,6 +231,7 @@ in
       kanshi # screen profiles
       swayidle # lock after 2 min (my_script lock)
       grim slurp # screenshots
+      wl-clipboard cliphist # clipboard history (wl-paste --watch cliphist store in sway/config)
     ];
   };
   # screen sharing (zoom, discord, firefox) and screenshots through the portal on sway
