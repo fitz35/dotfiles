@@ -1,10 +1,11 @@
 """
-`my_script github_menu <code|terminal>` : rofi menu to open a project folder.
+`my_script github_menu <zed|code|terminal>` : rofi menu to open a project folder.
 
 The listed folders are (most recently modified first) :
 - the subfolders of each PARENT_FOLDERS,
 - the HAND_PICKED_FOLDERS.
-The selected folder is opened in vscode (`code`, $mod+t) or in a kitty terminal (`terminal`, $mod+Alt+t).
+The selected folder is opened in zed (`zed`, $mod+t), vscode (`code`, $mod+Shift+t) or a kitty terminal (`terminal`, $mod+Alt+t) ;
+zed and vscode start inside the `nix develop` shell of the folder when it has a flake.nix.
 """
 
 import argparse
@@ -31,26 +32,30 @@ def list_folders() -> Dict[str, str]:
     return folders
 
 
-def open_code(directory: str) -> None:
-    """vscode in the directory, inside its `nix develop` shell when it has a flake.nix"""
+def open_editor(editor: str, directory: str) -> None:
+    """the editor in the directory, inside its `nix develop` shell when it has a flake.nix"""
     os.chdir(directory)
     if os.path.exists("flake.nix"):
-        if subprocess.run(["nix", "develop", "--command", "code", "."]).returncode == 0:
+        if subprocess.run(["nix", "develop", "--command", editor, "."]).returncode == 0:
             return
-        print("nix develop failed, opening vscode without it")
-    subprocess.run(["code", "."])
+        print(f"nix develop failed, opening {editor} without it")
+    subprocess.run([editor, "."])
 
 
 def open_terminal(directory: str) -> None:
     subprocess.Popen(["kitty", "--directory", directory])
 
 
-ACTIONS = {"code": open_code, "terminal": open_terminal}
+ACTIONS = {
+    "zed": lambda directory: open_editor("zeditor", directory),
+    "code": lambda directory: open_editor("code", directory),
+    "terminal": open_terminal,
+}
 
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Open a project folder chosen in rofi.")
-    parser.add_argument("action", choices=ACTIONS, help="open it in vscode or in a terminal")
+    parser.add_argument("action", choices=ACTIONS, help="open it in zed, vscode or a terminal")
     args = parser.parse_args()
 
     folders = list_folders()

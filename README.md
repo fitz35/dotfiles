@@ -12,7 +12,7 @@ Work in progress : [PLAN.md](PLAN.md) (my_script merged here, Inria VPN in Netwo
 | `polybar/` | the i3 bar |
 | `assets/` | wallpapers (`background_image/`) and login backgrounds (`login_images/`) |
 | `my_script/` | the commands of i3 and polybar (rofi menus, lock, wallpaper, polybar modules), installed by nixos |
-| `fonts/`, `greenclip/`, `dunst/` | custom font, clipboard manager config, notifications style |
+| `fonts/`, `greenclip/`, `dunst/`, `zed/` | custom font, clipboard manager config, notifications style, zed (with the VS Code look) |
 | `ssh/` | ssh hosts (the private ones stay local) |
 | `nix/` | dev shells (python, swh mining) |
 | `install.sh` | links the home configuration in `~` |

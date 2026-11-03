@@ -84,7 +84,7 @@ Out of scope : changing what the commands do (except vpn_menu), the uptime analy
 - [x] Step 4 : SSH only through Tailscale, keys only
 - [x] Step 5 : split configuration.nix into commented modules (no behaviour change, done first : proven by an identical system)
 - [ ] Step 6 : your checks after the switch (list below)
-- [ ] Step 7 : Zed with the VS Code look (zed/ linked by install.sh)
+- [x] Step 7 : Zed with the VS Code look (zed/ linked by install.sh), $mod+t opens zed, $mod+Shift+t vscode
 
 ## Diagnostic
 Machine : Dell Precision 3581, i7-13700H, Intel Raptor Lake GPU (all the outputs : laptop, DP, HDMI, dock), NVIDIA RTX A1000 (no output, free nouveau driver, suspended when idle), WiFi / Bluetooth Intel AX211, Thunderbolt dock (bolt), no fingerprint reader. System : 25.8 GB.

@@ -1,0 +1,57 @@
+// Zed settings, linked as ~/.config/zed/settings.json by install.sh (the changes made in Zed land in the repo).
+// The look of my VS Code, which uses its Linux defaults : 'Droid Sans Mono' (not installed : DejaVu Sans Mono) 14,
+// normal weight, line height 1.35, Dark Modern theme, vscode-icons, and the VS Code shortcuts.
+// Settings reference : https://zed.dev/docs/configuring-zed
+{
+  "project_panel": {
+    "dock": "left"
+  },
+  "outline_panel": {
+    "dock": "left"
+  },
+  "collaboration_panel": {
+    "dock": "left"
+  },
+  "agent": {
+    "dock": "right",
+    "favorite_models": [],
+    "model_parameters": []
+  },
+  "git_panel": {
+    "dock": "left"
+  },
+  "base_keymap": "VSCode",
+
+  // the theme and icons, installed automatically at the first start
+  "auto_install_extensions": {
+    "vscode-dark-modern": true,
+    "vscode-icons": true
+  },
+  "theme": "VSCode Dark Modern",
+  "icon_theme": "VSCode Icons for Zed (Dark)",
+
+  // editor : DejaVu Sans Mono 14, normal weight, line height 1.35 (the VS Code values on Linux)
+  "buffer_font_family": "DejaVu Sans Mono",
+  "buffer_font_size": 14,
+  "buffer_font_weight": 400,
+  "buffer_line_height": { "custom": 1.35 },
+
+  // interface : the VS Code one is the system sans font in 13
+  "ui_font_family": "DejaVu Sans",
+  "ui_font_size": 13,
+  "ui_font_weight": 400,
+  "agent_ui_font_size": 12,
+
+  "terminal": {
+    "font_family": "DejaVu Sans Mono",
+    "font_size": 14
+  },
+
+  "languages": {
+    "Rust": {
+      "inlay_hints": {
+        "enabled": true
+      }
+    }
+  }
+}
