@@ -482,6 +482,9 @@ in
 
   # autorandr (screen management)
   services.autorandr.enable = true;
+  # an unknown screen (video projector...) is turned on at the right of the laptop, without any workspace
+  # (same fallback as i3/screen_management.py)
+  services.autorandr.defaultTarget = "horizontal";
   
   # Enable polkit (https://nixos.wiki/wiki/Polkit) : privileges for the GUI apps (disks, network...)
   security.polkit.enable = true;

@@ -12,6 +12,9 @@ DIR = os.path.dirname(os.path.abspath(__file__))
 
 SCREEN_CONFIG = os.path.join(DIR, 'screen.json')
 SCREENS_CONF = os.path.join(DIR, 'screens.conf')
+# autorandr layout when no profile matches : all the screens side by side, in the xrandr order (the laptop first)
+# (same as services.autorandr.defaultTarget in the nixos configuration)
+AUTORANDR_DEFAULT = 'horizontal'
 
 
 @dataclass
@@ -125,7 +128,7 @@ if __name__ == '__main__':
     parser = get_argv_parser()
     args = parser.parse_args()
 
-    popen = os.popen('autorandr --change').read()
+    popen = os.popen(f'autorandr --change --default {AUTORANDR_DEFAULT}').read()
     profiles = AutoXrandrOutputs.create_from_autorandr_output()
     with open(SCREEN_CONFIG) as screen_config_file:
         profile_config = create_from_json(json.load(screen_config_file))

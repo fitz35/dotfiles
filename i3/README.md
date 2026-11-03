@@ -22,7 +22,9 @@ The autorandr profiles are in `autorandr/`, linked as `~/.config/autorandr/` by 
 - place the screens with `xrandr`, then `autorandr --save <profile>` (`--force` to update an existing one) : it is written directly in the repo
 - add the profile in `screen.json` (the EDIDs are in the `setup` file of the profile) : `screen1` is the main screen, `screen2` and `screen3` the others (`null` if missing)
 
-An unknown screen (a video projector...) isn't turned on by autorandr (no matching profile) and gets no workspace : all the workspaces stay assigned to the main screen. Once turned on (`xrandr --output <port> --auto --right-of eDP-1`), i3 only shows an empty workspace on it, move one there by hand with `$mod+Alt+4`.
+An unknown screen (a video projector...) is turned on automatically at the right of the laptop (autorandr `horizontal` layout, when no profile matches) and gets no workspace : all the workspaces stay assigned to the main screen, i3 only shows an empty workspace on it. Move one there by hand with `$mod+Alt+4`.
+
+> WARN : the `horizontal` layout uses all the connected screens, without rotation : an unknown screen plugged while docked also resets the dock screens (save a profile for this setup).
 
 # Power button
 
