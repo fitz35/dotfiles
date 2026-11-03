@@ -22,6 +22,11 @@ input type:keyboard {
     xkb_numlock enabled
 }
 
+# tap to click (on in X : the libinput default of nixos, off in sway)
+input type:touchpad {
+    tap enabled
+}
+
 # ------------------ bar ------------------
 bar {
     swaybar_command waybar

@@ -1,4 +1,5 @@
-/* waybar style : the colors of the polybar (polybar/config.ini [colors]) */
+/* waybar style : the colors of the polybar (polybar/config.ini [colors]) ; orange only for what matters
+   (focused workspace, clock, power), the rest in the normal text color. Reload : $mod+Shift+c (sway reload) */
 @define-color background #1c2128;
 @define-color background-alt #2d333b;
 @define-color foreground #adbac7;
@@ -9,10 +10,12 @@
 
 * {
     font-family: "JetBrainsMono Nerd Font";
-    font-size: 15px;
+    font-size: 18px;
     border: none;
     border-radius: 0;
     min-height: 0;
+    box-shadow: none;
+    text-shadow: none;
 }
 
 window#waybar {
@@ -20,56 +23,81 @@ window#waybar {
     color: @foreground;
 }
 
+/* workspaces : the gtk theme styles the buttons (hover, active...), reset them */
 #workspaces button {
-    padding: 0 8px;
+    padding: 0 10px;
+    color: @disabled;
+    background: transparent;
+}
+
+#workspaces button:hover {
+    background: @background-alt;
     color: @foreground;
-    background-color: transparent;
+}
+
+#workspaces button.visible {
+    color: @foreground;
 }
 
 #workspaces button.focused {
-    background-color: @background-alt;
+    color: @foreground;
+    background: @background-alt;
     box-shadow: inset 0 -3px @primary;
 }
 
 #workspaces button.urgent {
-    background-color: @alert;
+    color: @secondary;
 }
 
 #mode {
     color: @secondary;
+    padding: 0 8px;
 }
 
 #window {
-    color: @primary;
+    padding: 0 8px;
 }
 
-/* the module icons and values, like the primary prefixes of the polybar */
+/* modules : a bit of space around each one */
+#mpris,
+#pulseaudio,
+#backlight,
+#battery,
+#network,
+#bluetooth,
+#custom-system,
+#memory,
+#cpu,
+#temperature,
 #clock,
 #custom-uptime,
 #custom-timer,
 #custom-chronometer,
-#custom-system,
-#custom-power,
-#backlight {
+#tray,
+#custom-power {
+    padding: 0 10px;
+}
+
+#clock,
+#custom-power {
     color: @primary;
 }
 
+#custom-power {
+    padding-right: 12px;
+}
+
+/* states */
 #battery.warning {
     color: @secondary;
 }
 
 #battery.critical,
-#temperature.critical,
-#pulseaudio.muted {
+#temperature.critical {
     color: @alert;
 }
 
-#network.disconnected,
-#bluetooth.off,
-#bluetooth.disabled {
+#pulseaudio.muted,
+#network.disconnected {
     color: @disabled;
-}
-
-#custom-power {
-    padding-right: 10px;
 }

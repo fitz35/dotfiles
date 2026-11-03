@@ -1,13 +1,15 @@
 // waybar (sway bar), linked as ~/.config/waybar by install.sh : the modules of the polybar (i3), same colors (style.css).
-// The polybar toggles are drawers : hover the  icon for the system stats, the clock for the uptime / timer / chronometer.
+// The polybar toggles are drawers : hover the chip icon for the system stats, the clock for the uptime / timer / chronometer.
+// The icons are Nerd Font characters written as \u escapes (an editor can silently drop the raw characters).
+// Reload after a change : $mod+Shift+c (sway reload)
 {
     "layer": "top",
     "position": "top",
-    "height": 34,
-    "spacing": 10,
+    "height": 40,
+    "spacing": 6,
 
     "modules-left": ["sway/workspaces", "sway/mode", "sway/window"],
-    "modules-right": ["battery", "mpris", "pulseaudio", "backlight", "group/system", "network", "bluetooth", "group/time", "tray", "custom/power"],
+    "modules-right": ["mpris", "pulseaudio", "backlight", "battery", "network", "bluetooth", "group/system", "group/time", "tray", "custom/power"],
 
     "sway/workspaces": {
         "disable-scroll": true
@@ -16,30 +18,45 @@
         "max-length": 60
     },
 
-    "battery": {
-        "states": { "warning": 30, "critical": 20 },
-        "format": "{icon}  {capacity}%",
-        "format-charging": "󰂄 {capacity}%",
-        "format-full": "{icon} Fully charged",
-        "format-icons": ["", "", "", "", ""]
-    },
     "mpris": {
         "player": "spotify",
-        "format": " {artist} - {title}",
-        "format-paused": " {artist} - {title}",
-        "max-length": 40
+        "format": " {artist} - {title}",
+        "format-paused": " {artist} - {title}",
+        "max-length": 45
     },
     "pulseaudio": {
         "format": "{icon} {volume}%",
-        "format-muted": "󰝟 muted",
-        "format-icons": { "default": ["", "", ""] },
+        "format-muted": " muted",
+        "format-icons": { "default": ["", "", ""] },
         "on-click": "pactl set-sink-mute @DEFAULT_SINK@ toggle",
         "on-click-middle": "pavucontrol"
     },
     "backlight": {
-        "format": "󱩏 {percent}%",
+        "format": " {percent}%",
         "on-scroll-up": "brightnessctl set +10%",
         "on-scroll-down": "brightnessctl set 10%-"
+    },
+    "battery": {
+        "states": { "warning": 30, "critical": 20 },
+        "format": "{icon} {capacity}%",
+        "format-charging": " {capacity}%",
+        "format-plugged": " {capacity}%",
+        "format-icons": ["", "", "", "", ""]
+    },
+    "network": {
+        "format-wifi": " {essid}",
+        "format-ethernet": " {ifname}",
+        "format-disconnected": " offline",
+        "tooltip-format": "{ifname} {ipaddr}",
+        "on-click": "nm-connection-editor"
+    },
+    "bluetooth": {
+        "format": "",
+        "format-connected": " {device_alias}",
+        "format-off": "",
+        "format-disabled": "",
+        "tooltip-format": "bluetooth {status}",
+        "on-click": "blueman-manager"
     },
 
     "group/system": {
@@ -48,31 +65,18 @@
         "modules": ["custom/system", "memory", "cpu", "temperature"]
     },
     "custom/system": {
-        "format": "",
+        "format": "",
         "tooltip": false
     },
     "memory": {
-        "format": " {percentage}%"
+        "format": " {percentage}%"
     },
     "cpu": {
-        "format": " {usage}%"
+        "format": " {usage}%"
     },
     "temperature": {
-        "format": " {temperatureC}°C",
+        "format": " {temperatureC}°C",
         "critical-threshold": 85
-    },
-
-    "network": {
-        "format-wifi": " {essid}",
-        "format-ethernet": "󰈀 {ifname}",
-        "format-disconnected": "󰖪",
-        "tooltip-format": "{ifname} {ipaddr}",
-        "on-click": "nm-connection-editor"
-    },
-    "bluetooth": {
-        "format": " {status}",
-        "format-connected": " {device_alias}",
-        "on-click": "blueman-manager"
     },
 
     "group/time": {
@@ -88,12 +92,14 @@
     "custom/uptime": {
         "exec": "my_script uptime",
         "interval": 60,
-        "format": "󰄉 {}",
+        "format": " {}",
+        "tooltip": false,
         "on-click": "my_script uptime -display_entry"
     },
     "custom/timer": {
         "exec": "my_script timer watch",
-        "format": "󰔛 {}",
+        "format": " {}",
+        "tooltip": false,
         "on-click": "my_script timer toggle",
         "on-click-right": "my_script timer reset",
         "on-scroll-up": "my_script timer add 5",
@@ -101,7 +107,8 @@
     },
     "custom/chronometer": {
         "exec": "my_script chronometer watch",
-        "format": " {}",
+        "format": " {}",
+        "tooltip": false,
         "on-click": "my_script chronometer toggle",
         "on-click-right": "my_script chronometer reset"
     },
@@ -110,7 +117,7 @@
         "spacing": 8
     },
     "custom/power": {
-        "format": "",
+        "format": "",
         "tooltip": false,
         "on-click": "my_script logout_menu"
     }
