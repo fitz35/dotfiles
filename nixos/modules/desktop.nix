@@ -180,10 +180,9 @@ in
     "application/x-extension-xht" = "firefox.desktop";
   };
 
-  # graphics (hardware.opengl was renamed hardware.graphics in 24.11)
+  # graphics (mesa is the default driver ; the machine specific video decoding is in hosts/<hostname>/)
   hardware.graphics.enable = true;
-  hardware.graphics.extraPackages = [ pkgs.mesa ];
-  hardware.graphics.enable32Bit = true;
+  hardware.graphics.enable32Bit = true; # 32 bits apps (wine, steam...)
 
   # sound : pipewire (pulseaudio and alsa apps go through it, pactl / pamixer are only clients)
   # no sound but a "Dummy Output" : the card profile is "off" in ~/.local/state/wireplumber/default-profile,
