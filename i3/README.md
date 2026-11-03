@@ -22,6 +22,8 @@ The autorandr profiles are in `autorandr/`, linked as `~/.config/autorandr/` by 
 - place the screens with `xrandr`, then `autorandr --save <profile>` (`--force` to update an existing one) : it is written directly in the repo
 - add the profile in `screen.json` (the EDIDs are in the `setup` file of the profile) : `screen1` is the main screen, `screen2` and `screen3` the others (`null` if missing)
 
+In sway, the profiles are in `kanshi/config` (converted from the autorandr ones, a screen is matched by its `swaymsg -t get_outputs` description) : each one runs `screen_management.py --sway <screens>`, which writes `~/.config/sway/screens.conf` and sends the workspaces to the screens.
+
 An unknown screen (a video projector...) is turned on automatically at the right of the laptop (autorandr `horizontal` layout, when no profile matches) and gets no workspace : all the workspaces stay assigned to the main screen, i3 only shows an empty workspace on it. Move one there by hand with `$mod+Alt+4`.
 
 > WARN : the `horizontal` layout uses all the connected screens, without rotation : an unknown screen plugged while docked also resets the dock screens (save a profile for this setup).

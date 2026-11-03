@@ -1,14 +1,15 @@
 # Dotfiles
 
-The NixOS system (`nixos/`) and the home configuration (i3, polybar, screens...) of my machines.
+The NixOS system (`nixos/`) and the home configuration (sway / i3, bars, screens...) of my machines. Sway is the default session, i3 (X) stays available at the login.
 
 Work in progress : [PLAN.md](PLAN.md) (my_script merged here, Inria VPN in NetworkManager, Sway next to i3).
 
 | Folder | Content |
 | --- | --- |
 | `nixos/` | the NixOS flake : system, packages, services. One folder per machine in `nixos/hosts/` |
-| `i3/` | i3 config, screen management (autorandr profiles, workspaces per screen) |
-| `polybar/` | the bar |
+| `i3/` | i3 config (`common.conf` is shared with sway), screen management (autorandr profiles, workspaces per screen) |
+| `sway/`, `waybar/`, `kanshi/` | sway config (Wayland part), its bar, its screen profiles |
+| `polybar/` | the i3 bar |
 | `assets/` | wallpapers (`background_image/`) and login backgrounds (`login_images/`) |
 | `my_script/` | the commands of i3 and polybar (rofi menus, lock, wallpaper, polybar modules), installed by nixos |
 | `fonts/`, `greenclip/`, `dunst/` | custom font, clipboard manager config, notifications style |
@@ -26,9 +27,9 @@ Work in progress : [PLAN.md](PLAN.md) (my_script merged here, Inria VPN in Netwo
    - ssh key for github : generate a [key](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent) for each OS and add it to github (test : `ssh -T git@github.com`). The private ssh hosts are added in `~/.ssh/config` (copied once from `ssh/config`).
    - wifi 802.1X certificates in `/etc/nixos/wifi-certs/` (see [nixos/README.md](nixos/README.md#wifi-8021x-inria-interne-eduroam)).
    - vpn : create the NetworkManager connection once with `nm-connection-editor` (Inria : AnyConnect, gateway `vpn.inria.fr/all`, CA certificate kept outside the repository), the password is saved in the keyring.
-   - screens : save the new screen setups with autorandr (see [i3/README.md](i3/README.md#multiscreen)).
+   - screens : add the new screen setups to `kanshi/config` (sway) and autorandr (i3), see [i3/README.md](i3/README.md#multiscreen).
 
-Then, to apply a change of `nixos/` : `sh nixos/update_config.sh`, and to update the packages : `sh nixos/flake_update.sh` then `sh nixos/update_config.sh`. The home configuration is linked, a change is applied by reloading i3 (`$mod+Shift+c`).
+Then, to apply a change of `nixos/` : `sh nixos/update_config.sh`, and to update the packages : `sh nixos/flake_update.sh` then `sh nixos/update_config.sh`. The home configuration is linked, a change is applied by reloading sway / i3 (`$mod+Shift+c`).
 
 ## Workstation
 

@@ -1,0 +1,72 @@
+# kanshi : the screen profiles of sway (started by sway/config), linked as ~/.config/kanshi by install.sh.
+# Converted from the autorandr profiles of i3 (i3/autorandr/, screen.json) : same names, positions, rotation and screen roles.
+# A screen is matched by its description "make model serial" (swaymsg -t get_outputs) : the dock screens change names.
+# kanshi uses the first profile matching all the connected screens, then its exec gives the workspaces to the screens
+# (screen_management.py --sway <main screen> <screen 2> <screen 3>).
+# New setup : place the screens (swaymsg output ...), copy a profile with the descriptions of swaymsg -t get_outputs.
+# The rotation transform 270 is xrandr "left" (portrait screens) : use 90 if a screen is upside down.
+
+profile docked-work-inria {
+    output "Hewlett Packard HP E241i CN45090N87" mode 1920x1200@59.95Hz position 1920,0
+    output "Dell Inc. DELL U2412M Y1H5T22G3KAL" mode 1920x1200@59.95Hz position 3840,0 transform 270
+    output "HKC OVERSEAS LIMITED 0x3CFE Unknown" mode 1920x1080@59.99Hz position 0,0
+    exec python3 ~/.config/i3/screen_management.py --sway "Hewlett Packard HP E241i CN45090N87" "Dell Inc. DELL U2412M Y1H5T22G3KAL" "HKC OVERSEAS LIMITED 0x3CFE Unknown"
+}
+
+profile docked-home-dp1 {
+    output "Samsung Electric Company S22B350 0x30313636" mode 1920x1080@60.00Hz position 1920,0
+    output "Dell Inc. DELL E196FP FC9985B71NHM" mode 1280x1024@60.02Hz position 3840,0 transform 270
+    output "HKC OVERSEAS LIMITED 0x3CFE Unknown" mode 1920x1080@59.99Hz position 0,0
+    exec python3 ~/.config/i3/screen_management.py --sway "Samsung Electric Company S22B350 0x30313636" "Dell Inc. DELL E196FP FC9985B71NHM" "HKC OVERSEAS LIMITED 0x3CFE Unknown"
+}
+
+profile docked-home-dp2 {
+    output "Samsung Electric Company S22B350 0x30313636" mode 1920x1080@60.00Hz position 1920,0
+    output "Dell Inc. DELL E196FP FC9985B71NHM" mode 1280x1024@60.02Hz position 3840,0 transform 270
+    output "HKC OVERSEAS LIMITED 0x3CFE Unknown" mode 1920x1080@59.99Hz position 0,0
+    exec python3 ~/.config/i3/screen_management.py --sway "Samsung Electric Company S22B350 0x30313636" "Dell Inc. DELL E196FP FC9985B71NHM" "HKC OVERSEAS LIMITED 0x3CFE Unknown"
+}
+
+profile docked-home-1 {
+    output "ASUSTek COMPUTER INC ASUS VG249Q1A R9LMTF077696" mode 1920x1080@60.00Hz position 0,0
+    output * mode 1024x768@60.00Hz position 1920,0 transform 270
+    output "HKC OVERSEAS LIMITED 0x3CFE Unknown" disable
+    exec python3 ~/.config/i3/screen_management.py --sway "ASUSTek COMPUTER INC ASUS VG249Q1A R9LMTF077696" "*" "HKC OVERSEAS LIMITED 0x3CFE Unknown"
+}
+
+profile home-2-room {
+    output "Dell Inc. DELL E197FP HM0706B30NYS" mode 1280x1024@60.02Hz position 0,0
+    output "HKC OVERSEAS LIMITED 0x3CFE Unknown" mode 1920x1080@59.99Hz position 1280,0
+    exec python3 ~/.config/i3/screen_management.py --sway "HKC OVERSEAS LIMITED 0x3CFE Unknown" "Dell Inc. DELL E197FP HM0706B30NYS"
+}
+
+profile inria-box-double-green-f {
+    output "Dell Inc. DELL P2422H 8FQR9J3" mode 1920x1080@60.00Hz position 1920,0
+    output "HKC OVERSEAS LIMITED 0x3CFE Unknown" mode 1920x1080@59.99Hz position 0,0
+    exec python3 ~/.config/i3/screen_management.py --sway "HKC OVERSEAS LIMITED 0x3CFE Unknown" "Dell Inc. DELL P2422H 8FQR9J3"
+}
+
+profile inria-box-double-orange-f {
+    output "Dell Inc. DELL P2422H 7TNR9J3" mode 1920x1080@60.00Hz position 1920,0
+    output "HKC OVERSEAS LIMITED 0x3CFE Unknown" mode 1920x1080@59.99Hz position 0,0
+    exec python3 ~/.config/i3/screen_management.py --sway "HKC OVERSEAS LIMITED 0x3CFE Unknown" "Dell Inc. DELL P2422H 7TNR9J3"
+}
+
+profile b02a-22 {
+    output "Seiko Epson Corporation EPSON PJ 0x01010101" mode 1280x800@59.81Hz position 1920,0
+    output "HKC OVERSEAS LIMITED 0x3CFE Unknown" mode 1920x1080@59.99Hz position 0,0
+    exec python3 ~/.config/i3/screen_management.py --sway "HKC OVERSEAS LIMITED 0x3CFE Unknown" "Seiko Epson Corporation EPSON PJ 0x01010101"
+}
+
+profile standalone {
+    output "HKC OVERSEAS LIMITED 0x3CFE Unknown" mode 1920x1080@59.99Hz position 0,0
+    exec python3 ~/.config/i3/screen_management.py --sway "HKC OVERSEAS LIMITED 0x3CFE Unknown"
+}
+
+# an unknown screen (video projector...) : turned on at the right of the laptop by sway, without any workspace
+# (all of them stay on the laptop, move one there by hand with $mod+Alt+4) ; kanshi allows only one * per profile
+profile unknown {
+    output "HKC OVERSEAS LIMITED 0x3CFE Unknown" mode 1920x1080@59.99Hz position 0,0
+    output * enable
+    exec python3 ~/.config/i3/screen_management.py --sway "HKC OVERSEAS LIMITED 0x3CFE Unknown"
+}

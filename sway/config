@@ -40,8 +40,9 @@ exec /run/current-system/sw/libexec/polkit-gnome-authentication-agent-1
 exec wl-paste --watch cliphist store
 # lock after 2 min without activity, and before sleeping (in i3 : xset + xss-lock)
 exec swayidle -w timeout 120 '$my_script lock' before-sleep '$my_script lock'
-# screens : sway turns all of them on side by side ; the kanshi profiles (positions, rotation, workspaces)
-# come after a first login, from `swaymsg -t get_outputs` (the dock screens have other names than in X)
+# screens : kanshi applies the profile of the connected screens (~/.config/kanshi/config : positions, rotation,
+# then the workspaces of each screen with screen_management.py --sway)
+exec kanshi
 
 # screenshot of a zone, copied in the clipboard (in i3 : flameshot)
 bindsym $mod+Print exec grim -g "$(slurp)" - | wl-copy && notify-send "Screenshot" "copied in the clipboard"
@@ -49,8 +50,8 @@ bindsym $mod+Print exec grim -g "$(slurp)" - | wl-copy && notify-send "Screensho
 # move all the workspaces back to their assigned screen
 bindsym $mod+Mod1+r exec python3 $i3_config_folder/rearrange_workspaces.py
 
-# reload the configuration file
-bindsym $mod+Shift+c reload
+# reload the configuration file (then the kanshi profile : a reload resets the screens)
+bindsym $mod+Shift+c exec "swaymsg reload && kanshictl reload"
 # exit sway
 bindsym $mod+Shift+e exec swaynag -t warning -m 'Exit sway ? This will end your Wayland session.' -B 'Yes, exit sway' 'swaymsg exit'
 

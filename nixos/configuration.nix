@@ -235,6 +235,8 @@ in
   };
   # screen sharing (zoom, discord, firefox) and screenshots through the portal on sway
   xdg.portal.wlr.enable = true;
+  # sway is the session chosen by default at the login (i3 stays in the list of GDM)
+  services.displayManager.defaultSession = "sway";
 
   # ------------------------------ DISPLAY MANAGER ------------------------------
   # gdm always uses wayland since GNOME 50 (the "wayland" option was removed in 26.05)

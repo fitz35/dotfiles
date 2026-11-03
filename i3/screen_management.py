@@ -3,6 +3,7 @@ import argparse
 from dataclasses import dataclass, field
 import json
 import os
+import subprocess
 from time import sleep
 from typing import Dict, List, Optional
 import re
@@ -12,6 +13,7 @@ DIR = os.path.dirname(os.path.abspath(__file__))
 
 SCREEN_CONFIG = os.path.join(DIR, 'screen.json')
 SCREENS_CONF = os.path.join(DIR, 'screens.conf')
+SWAY_SCREENS_CONF = os.path.expanduser('~/.config/sway/screens.conf')
 # autorandr layout when no profile matches : all the screens side by side, in the xrandr order (the laptop first)
 # (same as services.autorandr.defaultTarget in the nixos configuration)
 AUTORANDR_DEFAULT = 'horizontal'
@@ -120,14 +122,52 @@ def write_screens_conf(screens_conf_path: str, changes: Dict[str, str]) -> None:
         # absolute path : the file is also included from the sway config
         file.write(f'include {os.path.join(DIR, "workspaces.conf")}\n')
         
+def get_sway_ports(descriptions: List[str]) -> List[str]:
+    """the sway names of the screens described by "make model serial" (as in the kanshi profile), "*" being
+    any other active screen ; a screen not found (e.g. the laptop when disabled) is replaced by the previous one"""
+    outputs = json.loads(subprocess.run(['swaymsg', '-t', 'get_outputs'], capture_output=True, text=True).stdout)
+    active = {f"{o['make']} {o['model']} {o['serial']}": o['name'] for o in outputs if o['active']}
+    ports: List[str] = []
+    for description in descriptions:
+        if description == '*':
+            others = [name for name in active.values() if name not in ports]
+            port = others[0] if others else None
+        else:
+            port = active.get(description)
+        if port is None and ports:
+            port = ports[-1]
+        if port is not None:
+            ports.append(port)
+    return ports
+
 def get_argv_parser():
-    parser = argparse.ArgumentParser(description='Detect and apply the screen configuration with autorandr and xrandr.')
+    parser = argparse.ArgumentParser(description='Detect and apply the screen configuration with autorandr and xrandr (i3), or the screens of a kanshi profile (sway).')
     parser.add_argument('-e', '--env', action='store_true', help="write the screens in the screens.conf file included by the i3 config")
+    parser.add_argument('--sway', nargs='+', metavar='DESCRIPTION', help="sway (run by the kanshi profiles) : the screens 1, 2, 3 by their description, then apply their workspaces")
     return parser
+
+def sway_main(descriptions: List[str]) -> None:
+    """write ~/.config/sway/screens.conf, then apply the workspace rules now (a sway reload would undo the kanshi
+    layout) and move the open workspaces to their screen"""
+    screen_ports = get_sway_ports(descriptions)
+    if len(screen_ports) == 0:
+        print("No screen of the profile found, keep the previous configuration")
+        exit(1)
+    while len(screen_ports) < 3:
+        screen_ports.append(screen_ports[-1])
+    changes = {f'$screen_{i + 1}': port for i, port in enumerate(screen_ports[:3])}
+    write_screens_conf(SWAY_SCREENS_CONF, changes)
+    subprocess.run(['python3', os.path.join(DIR, 'rearrange_workspaces.py'), '--apply-rules'])
+    for key, value in changes.items():
+        print(f"set {key} {value}")
 
 if __name__ == '__main__':
     parser = get_argv_parser()
     args = parser.parse_args()
+
+    if args.sway:
+        sway_main(args.sway)
+        exit(0)
 
     popen = os.popen(f'autorandr --change --default {AUTORANDR_DEFAULT}').read()
     profiles = AutoXrandrOutputs.create_from_autorandr_output()

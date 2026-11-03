@@ -44,6 +44,7 @@ def parse_workspace_outputs(config: str) -> Dict[str, List[str]]:
 def get_argv_parser():
     parser = argparse.ArgumentParser(description='Move the open workspaces to their assigned screen (from the i3 config).')
     parser.add_argument('-n', '--dry-run', action='store_true', help="only print the moves")
+    parser.add_argument('--apply-rules', action='store_true', help="sway : first send the workspace rules (after a screen change, without reloading)")
     return parser
 
 if __name__ == '__main__':
@@ -57,6 +58,8 @@ if __name__ == '__main__':
         with open(path) as config_file:
             config += config_file.read() + '\n'
     assignments = parse_workspace_outputs(config)
+    if args.apply_rules and not args.dry_run:
+        i3_msg('; '.join(f'workspace {json.dumps(name, ensure_ascii=False)} output {" ".join(outputs)}' for name, outputs in assignments.items()))
     active_outputs = {output['name'] for output in i3_msg('-t', 'get_outputs') if output['active']}
     workspaces = i3_msg('-t', 'get_workspaces')
 

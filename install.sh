@@ -28,6 +28,7 @@ link i3/autorandr "$HOME/.config/autorandr"
 link polybar "$HOME/.config/polybar"
 link sway "$HOME/.config/sway"
 link waybar "$HOME/.config/waybar"
+link kanshi "$HOME/.config/kanshi"
 
 # wallpapers (used by my_script wallpaper)
 link assets "$HOME/.config/assets"
