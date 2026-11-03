@@ -178,9 +178,11 @@ in
   services.xserver = {
     enable = true;
     # at login, before the window manager : apply the autorandr profile and write the i3 screens
-    # (i3/screens.conf), else i3 starts with the screens of the previous session
+    # (i3/screens.conf), else i3 starts with the screens of the previous session ; and turn the num lock on
+    # (an X session always starts with it off)
     displayManager.sessionCommands = ''
       ${pkgs.python3}/bin/python3 /home/${myConf.USER_NAME}/.config/i3/screen_management.py -e
+      ${pkgs.numlockx}/bin/numlockx on
     '';
     xkb.layout = "${myConf.KEYBOARD_LAYOUT}";
     xkb.options = "eurosign:e,caps:escape";
@@ -217,6 +219,17 @@ in
   # ------------------------------ DISPLAY MANAGER ------------------------------
   # gdm always uses wayland since GNOME 50 (the "wayland" option was removed in 26.05)
   services.displayManager.gdm.enable = true;
+  # num lock on in the login screen (locked : else gdm restores the last state it saw)
+  programs.dconf.profiles.gdm.databases = [{
+    settings."org/gnome/desktop/peripherals/keyboard" = {
+      numlock-state = true;
+      remember-numlock-state = false;
+    };
+    locks = [
+      "/org/gnome/desktop/peripherals/keyboard/numlock-state"
+      "/org/gnome/desktop/peripherals/keyboard/remember-numlock-state"
+    ];
+  }];
 
   # Workaround to fix the ssh-askpass error when using plasma and gnome
   # https://discourse.nixos.org/t/have-gnome-plasma-at-the-same-time/40991
