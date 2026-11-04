@@ -147,8 +147,11 @@ def get_argv_parser():
     return parser
 
 def sway_main(descriptions: List[str]) -> None:
-    """write ~/.config/sway/screens.conf, then apply the workspace rules now (a sway reload would undo the kanshi
-    layout) and move the open workspaces to their screen"""
+    """write ~/.config/sway/screens.conf, then move the open workspaces to their screen.
+
+    Sway keeps the first rule of a workspace (a rule sent live doesn't replace the one of the config), so when the
+    screens change, sway reloads its config (new rules) ; but a reload also resets the screens, so kanshi applies its
+    profile again, which runs this script again : screens.conf is unchanged, the open workspaces are moved."""
     screen_ports = get_sway_ports(descriptions)
     if len(screen_ports) == 0:
         print("No screen of the profile found, keep the previous configuration")
@@ -156,10 +159,17 @@ def sway_main(descriptions: List[str]) -> None:
     while len(screen_ports) < 3:
         screen_ports.append(screen_ports[-1])
     changes = {f'$screen_{i + 1}': port for i, port in enumerate(screen_ports[:3])}
-    write_screens_conf(SWAY_SCREENS_CONF, changes)
-    subprocess.run(['python3', os.path.join(DIR, 'rearrange_workspaces.py'), '--apply-rules'])
     for key, value in changes.items():
         print(f"set {key} {value}")
+
+    previous = open(SWAY_SCREENS_CONF).read() if os.path.exists(SWAY_SCREENS_CONF) else None
+    write_screens_conf(SWAY_SCREENS_CONF, changes)
+    if open(SWAY_SCREENS_CONF).read() != previous:
+        print("new screens : sway reload, then the kanshi profile again")
+        subprocess.run(['swaymsg', 'reload'])
+        subprocess.run(['kanshictl', 'reload'])
+        return
+    subprocess.run(['python3', os.path.join(DIR, 'rearrange_workspaces.py')])
 
 if __name__ == '__main__':
     parser = get_argv_parser()
