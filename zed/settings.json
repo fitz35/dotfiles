@@ -55,6 +55,8 @@
   // interface : DejaVu Sans ; 13 (the VS Code px value) looked smaller in Zed than in VS Code, Zed's default is 16
   "ui_font_family": "DejaVu Sans",
   "ui_font_size": 15,
+  // more room in the bars (title bar, tabs, status bar, panel headers) without bigger text
+  "ui_density": "comfortable",
   "ui_font_weight": 400,
   "agent_ui_font_size": 12,
 
