@@ -1,0 +1,19 @@
+// Zed keybindings, linked as ~/.config/zed/keymap.json by install.sh (on top of the VS Code base keymap).
+// Keymap reference : https://zed.dev/docs/key-bindings
+[
+  {
+    // Claude Code as the default agent : Zed has no "default agent" setting (the panel reuses the last agent picked,
+    // per workspace), so ctrl-n in the agent panel always opens a Claude Code thread ("claude-acp" in agent_servers)
+    // instead of Zed's native agent ; the other agents (Copilot...) stay in the "+" menu (ctrl-alt-shift-n)
+    "context": "AgentPanel",
+    "bindings": {
+      "ctrl-n": ["agent::NewExternalAgentThread", { "agent": "claude-acp" }]
+    }
+  },
+  {
+    "context": "AcpThread",
+    "bindings": {
+      "ctrl-n": ["agent::NewExternalAgentThread", { "agent": "claude-acp" }]
+    }
+  }
+]

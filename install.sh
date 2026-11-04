@@ -36,6 +36,7 @@ link assets "$HOME/.config/assets"
 link greenclip/greenclip.toml "$HOME/.config/greenclip.toml"
 link dunst/dunstrc "$HOME/.config/dunst/dunstrc"
 link zed/settings.json "$HOME/.config/zed/settings.json"
+link zed/keymap.json "$HOME/.config/zed/keymap.json"
 
 for font in "$repo_dir"/fonts/*.ttf; do
     link "fonts/$(basename "$font")" "$HOME/.fonts/$(basename "$font")"
