@@ -88,6 +88,24 @@ window#waybar {
     padding-right: 12px;
 }
 
+/* drawers (system, time) : while open, the whole group (the icon and the revealed modules) is one rounded pill
+   on a lighter background with an orange underline, so it is clear where it stops */
+#system,
+#time {
+    border-radius: 8px;
+    border-bottom: 2px solid transparent;
+}
+
+#system:hover,
+#time:hover {
+    background-color: @background-alt;
+    border-bottom-color: @primary;
+}
+
+.drawer-child {
+    background-color: @background-alt;
+}
+
 /* Claude : dimmed when no block is running */
 #custom-claude.idle {
     opacity: 0.5;
