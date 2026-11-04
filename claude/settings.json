@@ -1,0 +1,47 @@
+{
+  "model": "claude-sonnet-5-5",
+  "modelSettings": {
+    "claude-sonnet-5-5": {
+      "effortLevel": "medium"
+    },
+    "claude-opus-5-5": {
+      "effortLevel": "medium"
+    }
+  },
+  "env": {
+    "DISABLE_NON_ESSENTIAL_MODEL_CALLS": "1",
+    "BASH_MAX_OUTPUT_LENGTH": "15000"
+  },
+  "permissions": {
+    "allow": [
+      "Bash(git add *)",
+      "Bash(git status *)",
+      "Bash(git diff *)",
+      "Bash(git log *)",
+      "Bash(ls *)",
+      "Bash(grep *)",
+      "Bash(cat *)",
+      "Bash(bash -n *)"
+    ],
+    "deny": [
+      "Read(./result/**)",
+      "Read(**/.direnv/**)",
+      "Read(**/__pycache__/**)",
+      "Read(**/flake.lock)",
+      "Read(**/*.ttf)",
+      "Read(**/*.otf)"
+    ]
+  },
+  "hooks": {
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 ~/.claude/hooks/context_reminder.py"
+          }
+        ]
+      }
+    ]
+  }
+}

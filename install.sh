@@ -39,6 +39,11 @@ link zed/settings.json "$HOME/.config/zed/settings.json"
 link zed/keymap.json "$HOME/.config/zed/keymap.json"
 link zed/tasks.json "$HOME/.config/zed/tasks.json"
 
+# Claude Code : global rules, settings (Claude Code writes into it too : check its diff) and the context reminder hook
+link claude/CLAUDE.md "$HOME/.claude/CLAUDE.md"
+link claude/settings.json "$HOME/.claude/settings.json"
+link claude/hooks "$HOME/.claude/hooks"
+
 for font in "$repo_dir"/fonts/*.ttf; do
     link "fonts/$(basename "$font")" "$HOME/.fonts/$(basename "$font")"
 done

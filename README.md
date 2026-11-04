@@ -14,6 +14,7 @@ Work in progress : [PLAN.md](PLAN.md) (my_script merged here, Inria VPN in Netwo
 | `my_script/` | the commands of i3 and polybar (rofi menus, lock, wallpaper, polybar modules), installed by nixos |
 | `fonts/`, `greenclip/`, `dunst/`, `zed/` | custom font, clipboard manager config, notifications style, zed (with the VS Code look) |
 | `ssh/` | ssh hosts (the private ones stay local) |
+| `claude/` | Claude Code : global `CLAUDE.md` (token hygiene), `settings.json` (model, effort), the Stop hook reminding to open a new agent window above 100k tokens of context |
 | `nix/` | dev shells (python, swh mining) |
 | `install.sh` | links the home configuration in `~` |
 
