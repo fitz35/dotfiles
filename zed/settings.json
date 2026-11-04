@@ -6,6 +6,9 @@
   // Claude Code in the agent panel (through ACP, installed from Zed's registry)
   "agent_servers": {
     "claude-acp": {
+      "default_config_options": {
+        "mode": "auto"
+      },
       "type": "registry"
     }
   },
