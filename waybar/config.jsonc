@@ -66,7 +66,7 @@
     },
     "custom/system": {
         "format": "",
-        "tooltip": false
+        "tooltip-format": "System : hover to show the memory, CPU, temperature and / disk usage"
     },
     "memory": {
         "format": "\udb80\udf5b {percentage}%"
@@ -110,13 +110,13 @@
         "exec": "my_script uptime",
         "interval": 60,
         "format": " {}",
-        "tooltip": false,
+        "tooltip-format": "Time on the computer today : {}\nClick : the sessions of today",
         "on-click": "my_script uptime -display_entry"
     },
     "custom/timer": {
         "exec": "my_script timer watch",
         "format": " {}",
-        "tooltip": false,
+        "tooltip-format": "Countdown : {}\nClick : start / pause, right click : reset, scroll : ±5 s",
         "on-click": "my_script timer toggle",
         "on-click-right": "my_script timer reset",
         "on-scroll-up": "my_script timer add 5",
@@ -125,7 +125,7 @@
     "custom/chronometer": {
         "exec": "my_script chronometer watch",
         "format": " {}",
-        "tooltip": false,
+        "tooltip-format": "Stopwatch : {}\nClick : start / pause, right click : reset",
         "on-click": "my_script chronometer toggle",
         "on-click-right": "my_script chronometer reset"
     },
