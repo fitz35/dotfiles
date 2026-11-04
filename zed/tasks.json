@@ -1,0 +1,35 @@
+// Zed tasks, linked as ~/.config/zed/tasks.json by install.sh : command palette > "task: spawn" (alt-shift-t),
+// "task: rerun" (alt-t) for the last one. They run in Zed's terminal.
+// Tasks reference : https://zed.dev/docs/tasks
+[
+  {
+    "label": "nixos : rebuild (update_config.sh)",
+    "command": "sh ~/Documents/github/dotfiles/nixos/update_config.sh",
+    "use_new_terminal": true
+  },
+  {
+    "label": "nixos : update the flake, then rebuild",
+    "command": "sh ~/Documents/github/dotfiles/nixos/flake_update.sh && sh ~/Documents/github/dotfiles/nixos/update_config.sh",
+    "use_new_terminal": true
+  },
+  {
+    "label": "claude : token usage report",
+    "command": "my_script claude_usage report",
+    "use_new_terminal": true
+  },
+  {
+    "label": "disk : clean up / (my_script clean)",
+    "command": "my_script clean",
+    "use_new_terminal": true
+  },
+  {
+    "label": "disk : what takes the space in this project (gdu)",
+    "command": "gdu $ZED_WORKTREE_ROOT",
+    "use_new_terminal": true
+  },
+  {
+    "label": "git : log graph",
+    "command": "git log --graph --oneline --decorate -30",
+    "use_new_terminal": false
+  }
+]
