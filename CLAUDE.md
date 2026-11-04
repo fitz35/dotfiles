@@ -17,5 +17,5 @@ Read [README.md](README.md) for the layout (one row per folder) and [PLAN.md](PL
 - Commit messages : `<area> : <what changed>` (e.g. `waybar : ...`, `zed : ...`), one commit per topic.
 
 ## Monitoring
-- Disk : the waybar disk alert appears at 80 % ; `my_script clean` frees space (old generations, idle direnv shells, nix gc).
-- Claude usage : `my_script claude_usage report` (estimate from `~/.claude/projects`) ; the real % of the plan is `/usage`.
+- Disk alert at 80 % : `my_script clean`. Claude usage : `my_script claude_usage report` (real % : `/usage`).
+- Context hook thresholds : top of `claude/hooks/context_reminder.py`. `claude/settings.json` is also written by Claude Code : check its diff before each commit.
