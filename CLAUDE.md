@@ -19,3 +19,4 @@ Read [README.md](README.md) for the layout (one row per folder) and [PLAN.md](PL
 ## Monitoring
 - Disk alert at 80 % : `my_script clean`. Claude usage : `my_script claude_usage report` (real % : `/usage`).
 - Context hook thresholds : top of `claude/hooks/context_reminder.py`. `claude/settings.json` is also written by Claude Code : check its diff before each commit.
+- The waybar Claude module shows the real % (as `/usage`) read from `https://api.anthropic.com/api/oauth/usage` (header `anthropic-beta: oauth-2025-04-20`, token from `~/.claude/.credentials.json`, read only, never copied). This endpoint is undocumented : if the bar falls back to the log-based estimate (tooltip says "estimate"), test it by hand, then fix `real_usage()` in `my_script/commands/claude_usage.py` (expected keys : `five_hour` / `seven_day` with `utilization` and `resets_at`). The bar runs the Nix-packaged copy : rebuild (`sh nixos/update_config.sh`) after an edit.

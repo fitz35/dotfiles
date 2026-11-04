@@ -8,6 +8,7 @@
 - [x] Phase 4 : my_script works on X and Wayland
 - [ ] Phase 5 : Sway session next to i3 (session, waybar, kanshi profiles and default session done ; next : test the dock profiles and the rotation at work)
 - [ ] Phase 6 : remove the X-only parts (later, my decision)
+- [ ] Recheck if the bar shows the estimate (tooltip "estimate") instead of the real %: the Claude usage endpoint is undocumented and may have changed (see CLAUDE.md, Monitoring)
 
 ## Context
 `my_personnal_script` exists to make frequent actions one keystroke away (rofi menus, polybar modules, lock, wallpaper), and to plug easily into NixOS. Today it does the job, but it costs more than it should:
