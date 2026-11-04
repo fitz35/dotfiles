@@ -51,6 +51,8 @@ ACTIONS = {
     "code": lambda directory: open_editor("code", directory),
     "terminal": open_terminal,
 }
+# the prompt of the menu : which app the folder opens in
+PROMPTS = {"zed": "Open in Zed", "code": "Open in VS Code", "terminal": "Open in a terminal"}
 
 
 def main() -> None:
@@ -60,7 +62,7 @@ def main() -> None:
 
     folders = list_folders()
     # the names are given through stdin, so the special characters don't break the command
-    choice = subprocess.run([os.environ["MY_SCRIPT"], "rofi", "-dmenu", "-p", f"Select a folder to open {args.action} in "],
+    choice = subprocess.run([os.environ["MY_SCRIPT"], "rofi", "-dmenu", "-p", PROMPTS[args.action]],
                             input="\n".join(folders), text=True, capture_output=True).stdout.strip()
     if choice not in folders:
         sys.exit(1)  # nothing chosen
