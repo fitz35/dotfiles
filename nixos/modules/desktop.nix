@@ -119,7 +119,8 @@ in
         gnome-keyring # password management
         bc
         kitty
-        flameshot # screenshot
+        # screenshot, in i3 and sway (wlr support : grim captures the Wayland screens)
+        (flameshot.override { enableWlrSupport = true; })
         feh # wallpaper
         rofi # menu
 

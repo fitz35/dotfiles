@@ -43,9 +43,13 @@ exec swayidle -w timeout 120 '$my_script lock' before-sleep '$my_script lock'
 # screens : kanshi applies the profile of the connected screens (~/.config/kanshi/config : positions, rotation,
 # then the workspaces of each screen with screen_management.py --sway)
 exec kanshi
+# the system monitor, on the workspace 16 (assign below)
+exec mission-center
 
-# screenshot of a zone, copied in the clipboard (in i3 : flameshot)
-bindsym $mod+Print exec grim -g "$(slurp)" - | wl-copy && notify-send "Screenshot" "copied in the clipboard"
+# screenshot : flameshot (select, annotate, copy / save), as in i3 ; Print alone : the grim fallback (area to the clipboard)
+exec flameshot
+bindsym $mod+Print exec flameshot gui
+bindsym Print exec grim -g "$(slurp)" - | wl-copy && notify-send "Screenshot" "copied in the clipboard"
 
 # move all the workspaces back to their assigned screen
 bindsym $mod+Mod1+r exec python3 $i3_config_folder/rearrange_workspaces.py
@@ -65,6 +69,14 @@ assign [app_id="firefox"] $ws2
 assign [app_id="md.obsidian.Obsidian"] $ws4
 assign [app_id="discord"] $ws5
 assign [app_id="spotify"] $ws11
+# the system monitor, opened at startup (below) ; the workspace 16 ($mod+F6) is the monitoring one
+assign [app_id="io.missioncenter.MissionCenter"] $ws16
 for_window [app_id="code" title=".* - Visual Studio Code"] move container to workspace $ws3
 for_window [app_id="md.obsidian.Obsidian" title=".*notes*."] move container to workspace $ws4
 for_window [app_id="code" title=".*dotfiles - Visual Studio Code"] move container to workspace $ws9
+# zed on the workspace 3, except the dotfiles window (workspace 9, opened at login) ; each rule runs once per window,
+# so a zed window moved by hand stays where it is
+for_window [app_id="dev.zed.Zed"] move container to workspace $ws3
+for_window [app_id="dev.zed.Zed" title="^dotfiles( — .*)?$"] move container to workspace $ws9
+# flameshot : its capture overlay floats over the whole screen
+for_window [app_id="flameshot"] floating enable, fullscreen enable global
