@@ -4,7 +4,8 @@
 The listed folders are (most recently modified first) :
 - the subfolders of each PARENT_FOLDERS,
 - the HAND_PICKED_FOLDERS.
-The selected folder is opened in zed (`zed`, $mod+t), vscode (`code`, $mod+Shift+t) or a kitty terminal (`terminal`, $mod+Alt+t) ;
+The selected folder is opened in a new zed window (`zed`, $mod+t, even if the folder is already open in one), vscode
+(`code`, $mod+Shift+t) or a kitty terminal (`terminal`, $mod+Alt+t) ;
 zed and vscode start inside the `nix develop` shell of the folder when it has a flake.nix.
 """
 
@@ -12,7 +13,7 @@ import argparse
 import os
 import subprocess
 import sys
-from typing import Dict
+from typing import Dict, List
 
 # the subfolders of these folders are listed
 PARENT_FOLDERS = ["~/Documents/github/"]
@@ -32,14 +33,14 @@ def list_folders() -> Dict[str, str]:
     return folders
 
 
-def open_editor(editor: str, directory: str) -> None:
-    """the editor in the directory, inside its `nix develop` shell when it has a flake.nix"""
+def open_editor(editor: List[str], directory: str) -> None:
+    """the editor (command and options) in the directory, inside its `nix develop` shell when it has a flake.nix"""
     os.chdir(directory)
     if os.path.exists("flake.nix"):
-        if subprocess.run(["nix", "develop", "--command", editor, "."]).returncode == 0:
+        if subprocess.run(["nix", "develop", "--command", *editor, "."]).returncode == 0:
             return
-        print(f"nix develop failed, opening {editor} without it")
-    subprocess.run([editor, "."])
+        print(f"nix develop failed, opening {editor[0]} without it")
+    subprocess.run([*editor, "."])
 
 
 def open_terminal(directory: str) -> None:
@@ -47,17 +48,22 @@ def open_terminal(directory: str) -> None:
 
 
 ACTIONS = {
-    "zed": lambda directory: open_editor("zeditor", directory),
-    "code": lambda directory: open_editor("code", directory),
+    # -n : a new window, even if the folder is already open in one
+    "zed": lambda directory: open_editor(["zeditor", "-n"], directory),
+    "code": lambda directory: open_editor(["code"], directory),
     "terminal": open_terminal,
 }
 # the prompt of the menu : which app the folder opens in
-PROMPTS = {"zed": "Open in Zed", "code": "Open in VS Code", "terminal": "Open in a terminal"}
+PROMPTS = {
+    "zed": "Open in a new Zed window",
+    "code": "Open in VS Code",
+    "terminal": "Open in a terminal",
+}
 
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Open a project folder chosen in rofi.")
-    parser.add_argument("action", choices=ACTIONS, help="open it in zed, vscode or a terminal")
+    parser.add_argument("action", choices=ACTIONS, help="open it in a new zed window, vscode or a terminal")
     args = parser.parse_args()
 
     folders = list_folders()
