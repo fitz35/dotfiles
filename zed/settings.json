@@ -3,8 +3,10 @@
 // normal weight, line height 1.35, Dark Modern theme, vscode-icons, and the VS Code shortcuts.
 // Settings reference : https://zed.dev/docs/configuring-zed
 {
+  // the explorer : wider than Zed's 240 px (like the VS Code sidebar), its text is the ui_font_size
   "project_panel": {
-    "dock": "left"
+    "dock": "left",
+    "default_width": 300
   },
   "outline_panel": {
     "dock": "left"
@@ -50,9 +52,9 @@
   "buffer_font_weight": 400,
   "buffer_line_height": { "custom": 1.35 },
 
-  // interface : the VS Code one is the system sans font in 13
+  // interface : DejaVu Sans ; 13 (the VS Code px value) looked smaller in Zed than in VS Code, Zed's default is 16
   "ui_font_family": "DejaVu Sans",
-  "ui_font_size": 13,
+  "ui_font_size": 15,
   "ui_font_weight": 400,
   "agent_ui_font_size": 12,
 
@@ -60,6 +62,10 @@
     "font_family": "DejaVu Sans Mono",
     "font_size": 14
   },
+
+  // syntax colors like VS Code : the language server's semantic tokens (macros, crates, modules, types...) on top
+  // of Zed's tree-sitter colors (off by default in Zed : tree-sitter alone can't tell a crate from a variable)
+  "semantic_tokens": "combined",
 
   // inlay hints (types, argument names) everywhere, as in VS Code (off by default in Zed)
   "inlay_hints": {
