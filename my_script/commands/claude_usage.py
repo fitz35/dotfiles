@@ -1,4 +1,4 @@
-# Claude Code token usage, read from the local logs (~/.claude/projects/*/*.jsonl), like ccusage does.
+# Claude Code usage : the real % of /usage (same endpoint as the VS Code extension), else the local logs (~/.claude/projects/*/*.jsonl) as an estimate.
 # Usage : my_script claude_usage          : waybar json (the tokens of the current 5 h block and its time left)
 #         my_script claude_usage report   : the current block and the last 7 days, per model + context per request
 #         my_script claude_usage calibrate <5h %> <week %> : read both % in /usage, so the estimated % are right
@@ -9,6 +9,7 @@ import json
 import os
 import sys
 import time
+import urllib.request
 from collections import defaultdict
 from datetime import datetime, timedelta
 
@@ -87,6 +88,56 @@ def load_limits():
         return {}
 
 
+def real_usage():
+    """The real % of /usage (undocumented oauth endpoint, same as the VS Code extension), cached 60 s so the bar
+    doesn't hammer it. None if offline / token expired / endpoint changed : the caller falls back to the estimate."""
+    cache = os.path.expanduser("~/.cache/my_script/claude_real_usage.json")
+    try:
+        if time.time() - os.path.getmtime(cache) < 60:
+            with open(cache) as f:
+                return json.load(f) or None
+    except (OSError, ValueError):
+        pass
+    data = None
+    try:
+        with open(os.path.expanduser("~/.claude/.credentials.json")) as f:
+            token = json.load(f)["claudeAiOauth"]["accessToken"]
+        request = urllib.request.Request("https://api.anthropic.com/api/oauth/usage", headers={
+            "Authorization": f"Bearer {token}", "anthropic-beta": "oauth-2025-04-20"})
+        with urllib.request.urlopen(request, timeout=5) as response:
+            raw = json.load(response)
+        data = {k: {"pct": raw[k]["utilization"], "reset": raw[k]["resets_at"]} for k in ("five_hour", "seven_day")}
+    except (OSError, ValueError, KeyError, TypeError):
+        pass
+    os.makedirs(os.path.dirname(cache), exist_ok=True)  # a failure is cached too (empty) : no retry every second
+    with open(cache, "w") as f:
+        json.dump(data or {}, f)
+    return data
+
+
+def reset_in(iso):
+    left = datetime.fromisoformat(iso) - datetime.now().astimezone()
+    if left.total_seconds() < 0:
+        return "0h00"
+    if left.days:
+        return f"{left.days}d{left.seconds // 3600:02d}h"
+    return f"{left.seconds // 3600}h{left.seconds % 3600 // 60:02d}"
+
+
+def waybar_real(real):
+    five, week = real["five_hour"], real["seven_day"]
+    pct = max(five["pct"], week["pct"])
+    css = "critical" if pct >= 90 else "warning" if pct >= 75 else "active"
+    tooltip = "\n".join([
+        f"Claude plan usage (real, same as /usage)",
+        f"5 h : {five['pct']:.0f}% (reset in {reset_in(five['reset'])})",
+        f"Week : {week['pct']:.0f}% (reset in {reset_in(week['reset'])})",
+        "Click : the usage report",
+    ])
+    print(json.dumps({"text": f"󰚛 {five['pct']:.0f}% · {week['pct']:.0f}% week · {reset_in(five['reset'])}",
+                      "class": css, "tooltip": tooltip}))
+
+
 def percent(used, key, limits):
     return f"{used / limits[key] * 100:.0f}%" if limits.get(key) else "?%"
 
@@ -124,6 +175,9 @@ def model_lines(entries):
 
 
 def waybar():
+    real = real_usage()
+    if real:
+        return waybar_real(real)
     now = datetime.now().astimezone()
     entries = read_entries(now - WEEK)
     start, block = current_block(entries, now)

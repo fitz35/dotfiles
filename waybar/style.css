@@ -112,10 +112,12 @@ window#waybar {
 }
 
 /* states */
+#custom-claude.warning,
 #battery.warning {
     color: @secondary;
 }
 
+#custom-claude.critical,
 #battery.critical,
 #temperature.critical,
 #disk.critical {
