@@ -128,9 +128,8 @@ ICON = "\uf069"  # asterisk, close to the Claude logo
 
 
 def emit(bar):
-    """waybar json. `short` (the drawer leader) : the icon and the 5 h % ; otherwise the details (drawer child)."""
-    head, _, rest = bar["text"].partition(" · ")
-    bar["text"] = head if "short" in sys.argv[1:] else (rest or head.removeprefix(ICON).strip())
+    """waybar json. `short` (the drawer leader) : only the icon ; otherwise the numbers (drawer child)."""
+    bar["text"] = ICON if "short" in sys.argv[1:] else bar["text"].removeprefix(ICON).strip()
     print(json.dumps(bar))
 
 

@@ -71,7 +71,7 @@
     },
     // Claude Code : real % of the 5 h block and of the week (as /usage) and the time left before the reset
     // (my_script claude_usage ; falls back to an estimate from the local logs when offline).
-    // Drawer : the icon and the 5 h % in the bar, hover for the week % and the reset (the tooltip has the details)
+    // Drawer : only the icon in the bar, hover for the 5 h %, the week % and the reset (the tooltip has the details)
     "group/claude": {
         "orientation": "inherit",
         "drawer": { "transition-duration": 300, "children-class": "drawer-child", "transition-left-to-right": false },
