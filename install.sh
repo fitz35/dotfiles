@@ -35,6 +35,7 @@ link assets "$HOME/.config/assets"
 
 link greenclip/greenclip.toml "$HOME/.config/greenclip.toml"
 link dunst/dunstrc "$HOME/.config/dunst/dunstrc"
+link flameshot/flameshot.ini "$HOME/.config/flameshot/flameshot.ini"
 link zed/settings.json "$HOME/.config/zed/settings.json"
 link zed/keymap.json "$HOME/.config/zed/keymap.json"
 link zed/tasks.json "$HOME/.config/zed/tasks.json"
