@@ -43,6 +43,8 @@ exec swayidle -w timeout 120 '$my_script lock' before-sleep '$my_script lock'
 # screens : kanshi applies the profile of the connected screens (~/.config/kanshi/config : positions, rotation,
 # then the workspaces of each screen with screen_management.py --sway)
 exec kanshi
+# a reload resets the screens and the workspaces : re-apply the profile on each one (also a plain `swaymsg reload`)
+exec_always kanshictl reload
 # the system monitor, on the workspace 16 (assign below)
 exec mission-center
 
@@ -54,8 +56,8 @@ bindsym Print exec grim -g "$(slurp)" - | wl-copy && notify-send "Screenshot" "c
 # move all the workspaces back to their assigned screen
 bindsym $mod+Mod1+r exec python3 $i3_config_folder/rearrange_workspaces.py
 
-# reload the configuration file (then the kanshi profile : a reload resets the screens)
-bindsym $mod+Shift+c exec "swaymsg reload && kanshictl reload"
+# reload the configuration file (the kanshi profile is re-applied by the exec_always above)
+bindsym $mod+Shift+c reload
 # exit sway
 bindsym $mod+Shift+e exec swaynag -t warning -m 'Exit sway ? This will end your Wayland session.' -B 'Yes, exit sway' 'swaymsg exit'
 
