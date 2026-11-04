@@ -50,6 +50,19 @@
     "http": true // http-client
   },
   "theme": "VSCode Dark Modern",
+  // clearer separations : the theme's borders (#2B2B2B, the split line at 9 % white) hardly show on its dark
+  // backgrounds, so they use #454545 (the VS Code border), and the active pane is framed in the VS Code blue
+  "theme_overrides": {
+    "VSCode Dark Modern": {
+      "border": "#454545",
+      "pane_group.border": "#454545",
+      "pane.focused_border": "#0078D4"
+    }
+  },
+  "active_pane_modifiers": {
+    "border_size": 1.0,
+    "inactive_opacity": 1.0
+  },
   "icon_theme": "VSCode Icons for Zed (Dark)",
 
   // editor : DejaVu Sans Mono 14, normal weight, line height 1.35 (the VS Code values on Linux)
