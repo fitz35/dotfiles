@@ -69,7 +69,7 @@
         "tooltip-format": "System : hover to show the memory, CPU, temperature and / disk usage\nClick : Mission Center",
         "on-click": "swaymsg '[app_id=io.missioncenter.MissionCenter] focus' || mission-center"
     },
-    // Claude Code : the tokens written by Claude in the current 5 h block, and its time left (my_script claude_usage,
+    // Claude Code : estimated % of the 5 h block and of the week, and the block time left (my_script claude_usage,
     // an estimate from the local logs ; the real % of the plan is /usage in Claude Code)
     "custom/claude": {
         "exec": "my_script claude_usage",

@@ -1,6 +1,7 @@
 # Claude Code token usage, read from the local logs (~/.claude/projects/*/*.jsonl), like ccusage does.
 # Usage : my_script claude_usage          : waybar json (the tokens of the current 5 h block and its time left)
-#         my_script claude_usage report   : the current block and the last 7 days, per model (in a terminal)
+#         my_script claude_usage report   : the current block and the last 7 days, per model + context per request
+#         my_script claude_usage calibrate <5h %> <week %> : read both % in /usage, so the estimated % are right
 # Only the sessions of this machine are counted, and the % of the plan limits (shown by /usage in Claude Code)
 # isn't in the logs : the block here is an estimate (5 h from its first message, as the reset time shown by /usage).
 import glob
@@ -12,7 +13,9 @@ from collections import defaultdict
 from datetime import datetime, timedelta
 
 BLOCK = timedelta(hours=5)
+WEEK = timedelta(days=7)
 PROJECTS = os.path.expanduser("~/.claude/projects")
+LIMITS = os.path.expanduser("~/.config/my_script/claude_limits.json")  # machine-specific, not in the repo
 
 
 def read_entries(since):
@@ -71,6 +74,38 @@ def total(tokens):
     return sum(tokens.values())
 
 
+def weighted(entries):
+    """Tokens counted against the limits : the cache reads are left out (they are cheap and would dominate)."""
+    return sum(t["input"] + t["output"] + t["cache_write"] for _, _, t in entries)
+
+
+def load_limits():
+    try:
+        with open(LIMITS) as f:
+            return json.load(f)
+    except (OSError, ValueError):
+        return {}
+
+
+def percent(used, key, limits):
+    return f"{used / limits[key] * 100:.0f}%" if limits.get(key) else "?%"
+
+
+def calibrate(pct_block, pct_week):
+    """limit = what is used now / the % shown by /usage (the more used at that time, the more exact)."""
+    now = datetime.now().astimezone()
+    entries = read_entries(now - WEEK)
+    _, block = current_block(entries, now)
+    limits = load_limits()
+    for key, used, pct in (("block", weighted(block), pct_block), ("week", weighted(entries), pct_week)):
+        if pct > 0 and used > 0:
+            limits[key] = round(used / pct * 100)
+    os.makedirs(os.path.dirname(LIMITS), exist_ok=True)
+    with open(LIMITS, "w") as f:
+        json.dump(limits, f)
+    print(f"limits saved in {LIMITS} : {limits}")
+
+
 def per_model(entries):
     models = defaultdict(lambda: defaultdict(int))
     for _, model, tokens in entries:
@@ -90,10 +125,13 @@ def model_lines(entries):
 
 def waybar():
     now = datetime.now().astimezone()
-    start, block = current_block(read_entries(now - BLOCK * 2), now)
+    entries = read_entries(now - WEEK)
+    start, block = current_block(entries, now)
+    limits = load_limits()
+    week = percent(weighted(entries), "week", limits)
     if not block:
-        print(json.dumps({"text": "󰚛 -", "class": "idle",
-                          "tooltip": "Claude : no message in the last 5 h\nClick : the usage report"}))
+        print(json.dumps({"text": f"󰚛 - · {week} week", "class": "idle",
+                          "tooltip": f"Claude : no message in the last 5 h, week (rolling 7 d) {week}\nClick : the usage report"}))
         return
     left = start + BLOCK - now
     hours, minutes = divmod(int(left.total_seconds()) // 60, 60)
@@ -102,11 +140,13 @@ def waybar():
     tooltip = "\n".join([
         f"Claude, 5 h block {start:%H:%M} → {start + BLOCK:%H:%M} ({hours}h{minutes:02d} left, estimate)",
         f"{len(block)} requests, {human(tokens)} tokens ({human(output)} written by Claude)",
+        f"5 h block {percent(weighted(block), 'block', limits)}, week (rolling 7 d) {week} : estimates, "
+        "set them right with : my_script claude_usage calibrate <5h %> <week %>",
         *model_lines(block),
         "Real % of the plan : /usage in Claude Code",
         "Click : the usage report",
     ])
-    print(json.dumps({"text": f"󰚛 {human(output)} · {hours}h{minutes:02d}",
+    print(json.dumps({"text": f"󰚛 {percent(weighted(block), 'block', limits)} · {week} week · {hours}h{minutes:02d}",
                       "class": "active", "tooltip": tooltip}))
 
 
@@ -126,13 +166,18 @@ def report():
         days[entry[0].date()].append(entry)
     for day in sorted(days):
         tokens = sum(total(t) for _, _, t in days[day])
-        print(f"{day:%a %d %b} : {len(days[day]):5d} requests, {human(tokens):>7} tokens")
+        contexts = [t["input"] + t["cache_read"] + t["cache_write"] for _, _, t in days[day]]
+        print(f"{day:%a %d %b} : {len(days[day]):5d} requests, {human(tokens):>7} tokens, context per request "
+              f"avg {human(sum(contexts) // len(contexts))} / max {human(max(contexts))}, "
+              f"{100 * sum(c > 100_000 for c in contexts) // len(contexts)}% of requests above 100k")
         print("\n".join(model_lines(days[day])))
-    print("\nThe % of the plan limits : /usage in Claude Code. Tip : /clear between tasks.")
+    print("\nThe % of the plan limits : /usage in Claude Code. Goal : the average context per request goes down.")
 
 
 if __name__ == "__main__":
     if sys.argv[1:] == ["report"]:
         report()
+    elif len(sys.argv) == 4 and sys.argv[1] == "calibrate":
+        calibrate(float(sys.argv[2]), float(sys.argv[3]))
     else:
         waybar()
