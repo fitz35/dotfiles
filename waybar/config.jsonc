@@ -104,7 +104,16 @@
     "clock": {
         "format": "{:%H:%M}",
         "format-alt": "{:%A %d %B %Y}",
-        "tooltip-format": "<tt>{calendar}</tt>"
+        // hover : the date, then the calendar with today highlighted (orange, bold, underlined)
+        "tooltip-format": "<big>{:%A %d %B %Y}</big>\n<tt>{calendar}</tt>",
+        "calendar": {
+            "mode": "month",
+            "format": {
+                "today": "<span color='#ff8700'><b><u>{}</u></b></span>",
+                "weekdays": "<span color='#f0b746'><b>{}</b></span>",
+                "months": "<span color='#adbac7'><b>{}</b></span>"
+            }
+        }
     },
     "custom/uptime": {
         "exec": "my_script uptime",
