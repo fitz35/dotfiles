@@ -35,6 +35,8 @@
 
     # files
     nautilus
+    mission-center # system monitor (CPU, RAM, disks, GPU, processes), opened at startup on the workspace 16
+    gdu # disk usage explorer (click on the waybar disk)
     unzip
     tree
 
