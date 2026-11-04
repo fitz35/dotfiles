@@ -69,7 +69,7 @@ window#waybar {
 #memory,
 #cpu,
 #temperature,
-#clock,
+#custom-clock,
 #custom-uptime,
 #custom-timer,
 #custom-chronometer,
@@ -78,7 +78,7 @@ window#waybar {
     padding: 0 10px;
 }
 
-#clock,
+#custom-clock,
 #custom-power {
     color: @primary;
 }
