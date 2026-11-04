@@ -63,7 +63,12 @@
   "ui_font_family": "DejaVu Sans",
   "ui_font_size": 18,
   "ui_font_weight": 400,
-  "agent_ui_font_size": 12,
+  // the AI panel : the answers bigger than the rest (DejaVu Sans 20), my messages smaller and monospaced (15),
+  // so the answers stand out (Zed has no color setting for the panel alone, it uses the theme colors)
+  "agent_ui_font_family": "DejaVu Sans",
+  "agent_ui_font_size": 20,
+  "agent_buffer_font_family": "DejaVu Sans Mono",
+  "agent_buffer_font_size": 15,
 
   "terminal": {
     "font_family": "DejaVu Sans Mono",
