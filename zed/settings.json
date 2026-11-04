@@ -10,7 +10,7 @@
         "model": "sonnet",
         "fast": false,
         "effort": "low",
-        "mode": "plan"
+        "mode": "auto"
       },
       "type": "registry"
     }
