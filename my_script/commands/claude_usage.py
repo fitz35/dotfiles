@@ -124,6 +124,16 @@ def reset_in(iso):
     return f"{left.seconds // 3600}h{left.seconds % 3600 // 60:02d}"
 
 
+ICON = "\uf069"  # asterisk, close to the Claude logo
+
+
+def emit(bar):
+    """waybar json. `short` (the drawer leader) : the icon and the 5 h % ; otherwise the details (drawer child)."""
+    head, _, rest = bar["text"].partition(" · ")
+    bar["text"] = head if "short" in sys.argv[1:] else (rest or head.removeprefix(ICON).strip())
+    print(json.dumps(bar))
+
+
 def waybar_real(real):
     five, week = real["five_hour"], real["seven_day"]
     pct = max(five["pct"], week["pct"])
@@ -134,7 +144,7 @@ def waybar_real(real):
         f"Week : {week['pct']:.0f}% (reset in {reset_in(week['reset'])})",
         "Click : the usage report",
     ])
-    print(json.dumps({"text": f"󰚛 {five['pct']:.0f}% · {week['pct']:.0f}% week · {reset_in(five['reset'])}",
+    emit(({"text": f"\uf069 {five['pct']:.0f}% · {week['pct']:.0f}% week · {reset_in(five['reset'])}",
                       "class": css, "tooltip": tooltip}))
 
 
@@ -184,7 +194,7 @@ def waybar():
     limits = load_limits()
     week = percent(weighted(entries), "week", limits)
     if not block:
-        print(json.dumps({"text": f"󰚛 - · {week} week", "class": "idle",
+        emit(({"text": f"\uf069 - · {week} week", "class": "idle",
                           "tooltip": f"Claude : no message in the last 5 h, week (rolling 7 d) {week}\nClick : the usage report"}))
         return
     left = start + BLOCK - now
@@ -200,7 +210,7 @@ def waybar():
         "Real % of the plan : /usage in Claude Code",
         "Click : the usage report",
     ])
-    print(json.dumps({"text": f"󰚛 {percent(weighted(block), 'block', limits)} · {week} week · {hours}h{minutes:02d}",
+    emit(({"text": f"\uf069 {percent(weighted(block), 'block', limits)} · {week} week · {hours}h{minutes:02d}",
                       "class": "active", "tooltip": tooltip}))
 
 

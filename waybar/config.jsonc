@@ -9,7 +9,7 @@
     "spacing": 6,
 
     "modules-left": ["sway/workspaces", "sway/mode", "sway/window"],
-    "modules-right": ["mpris", "pulseaudio", "backlight", "battery", "network", "bluetooth", "custom/claude", "group/system", "disk#alert", "group/time", "tray", "custom/power"],
+    "modules-right": ["mpris", "pulseaudio", "backlight", "battery", "network", "bluetooth", "group/claude", "group/system", "disk#alert", "group/time", "tray", "custom/power"],
 
     "sway/workspaces": {
         "disable-scroll": true
@@ -70,7 +70,19 @@
         "on-click": "swaymsg '[app_id=io.missioncenter.MissionCenter] focus' || mission-center"
     },
     // Claude Code : real % of the 5 h block and of the week (as /usage) and the time left before the reset
-    // (my_script claude_usage ; falls back to an estimate from the local logs when offline)
+    // (my_script claude_usage ; falls back to an estimate from the local logs when offline).
+    // Drawer : the icon and the 5 h % in the bar, hover for the week % and the reset (the tooltip has the details)
+    "group/claude": {
+        "orientation": "inherit",
+        "drawer": { "transition-duration": 300, "children-class": "drawer-child", "transition-left-to-right": false },
+        "modules": ["custom/claude-short", "custom/claude"]
+    },
+    "custom/claude-short": {
+        "exec": "my_script claude_usage short",
+        "return-type": "json",
+        "interval": 60,
+        "on-click": "kitty --hold my_script claude_usage report"
+    },
     "custom/claude": {
         "exec": "my_script claude_usage",
         "return-type": "json",

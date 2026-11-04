@@ -67,6 +67,7 @@ window#waybar {
 #bluetooth,
 #custom-system,
 #custom-claude,
+#custom-claude-short,
 #memory,
 #cpu,
 #temperature,
@@ -107,17 +108,20 @@ window#waybar {
 }
 
 /* Claude : dimmed when no block is running */
-#custom-claude.idle {
+#custom-claude.idle,
+#custom-claude-short.idle {
     opacity: 0.5;
 }
 
 /* states */
 #custom-claude.warning,
+#custom-claude-short.warning,
 #battery.warning {
     color: @secondary;
 }
 
 #custom-claude.critical,
+#custom-claude-short.critical,
 #battery.critical,
 #temperature.critical,
 #disk.critical {
