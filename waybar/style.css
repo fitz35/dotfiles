@@ -93,8 +93,18 @@ window#waybar {
 }
 
 #battery.critical,
-#temperature.critical {
+#temperature.critical,
+#disk.critical {
     color: @alert;
+}
+
+/* the / partition nearly full (disk#alert, hidden below 80 %) */
+#disk.warning {
+    color: @secondary;
+}
+
+#disk {
+    padding: 0 10px;
 }
 
 #pulseaudio.muted,
