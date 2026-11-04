@@ -9,7 +9,7 @@
     "spacing": 6,
 
     "modules-left": ["sway/workspaces", "sway/mode", "sway/window"],
-    "modules-right": ["disk#alert", "mpris", "pulseaudio", "backlight", "battery", "network", "bluetooth", "group/system", "group/time", "tray", "custom/power"],
+    "modules-right": ["mpris", "pulseaudio", "backlight", "battery", "network", "bluetooth", "group/system", "disk#alert", "group/time", "tray", "custom/power"],
 
     "sway/workspaces": {
         "disable-scroll": true
@@ -69,7 +69,7 @@
         "tooltip": false
     },
     "memory": {
-        "format": " {percentage}%"
+        "format": "\udb80\udf5b {percentage}%"
     },
     "cpu": {
         "format": " {usage}%"
