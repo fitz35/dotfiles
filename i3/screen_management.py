@@ -1,13 +1,14 @@
+#!/usr/bin/env python3
 # Equivalent of DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 import argparse
-from dataclasses import dataclass, field
 import json
 import os
-import subprocess
-from time import sleep
-from typing import Dict, List, Optional
 import re
-
+import subprocess
+import sys
+from collections.abc import Callable
+from dataclasses import dataclass, field
+from typing import NotRequired, TypedDict, cast
 
 DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -17,6 +18,34 @@ SWAY_SCREENS_CONF = os.path.expanduser('~/.config/sway/screens.conf')
 # autorandr layout when no profile matches : all the screens side by side, in the xrandr order (the laptop first)
 # (same as services.autorandr.defaultTarget in the nixos configuration)
 AUTORANDR_DEFAULT = 'horizontal'
+
+
+class ScreensJson(TypedDict):
+    """a profile of screen.json"""
+    screen1: str
+    screen2: NotRequired[str]
+    screen3: NotRequired[str]
+
+class ScreenConfigJson(TypedDict):
+    """screen.json"""
+    profiles: dict[str, ScreensJson]
+
+class SwayOutput(TypedDict):
+    """the fields used from `swaymsg -t get_outputs`"""
+    name: str
+    make: str
+    model: str
+    serial: str
+    active: bool
+
+
+def run_output(command: list[str]) -> str:
+    """the stdout of a command, even if it fails (as os.popen did)"""
+    return subprocess.run(command, capture_output=True, text=True, check=False).stdout
+
+def read_file(path: str) -> str:
+    with open(path) as file:
+        return file.read()
 
 
 @dataclass
@@ -29,12 +58,12 @@ class AutoXrandrProfile:
 @dataclass
 class AutoXrandrOutputs:
     """Dataclass for autoxrandr output"""
-    profiles: List[AutoXrandrProfile]
+    profiles: list[AutoXrandrProfile]
 
     @staticmethod
     def create_from_autorandr_output() -> 'AutoXrandrOutputs':
-        output = os.popen('autorandr').read()
-        profiles = []
+        output = run_output(['autorandr'])
+        profiles: list[AutoXrandrProfile] = []
         # Split the output into lines and process each line
         for line in output.strip().split('\n'):
             match = re.search(r'^(?P<name>\S+)( \((detected)\))?( \((current)\))?$', line)
@@ -49,27 +78,27 @@ class AutoXrandrOutputs:
 class Profile:
     """Dataclass for each profile with specific screens"""
     screen1: str
-    screen2: Optional[str]
-    screen3: Optional[str]
+    screen2: str | None
+    screen3: str | None
 
 @dataclass
 class AutoXrandrConfig:
     """Dataclass for the overall configuration"""
-    profiles: Dict[str, Profile] = field(default_factory=dict)
+    profiles: dict[str, Profile] = field(default_factory=dict)
 
 # Function to create an instance from the JSON data
-def create_from_json(data: dict) -> AutoXrandrConfig:
+def create_from_json(data: ScreenConfigJson) -> AutoXrandrConfig:
     config = AutoXrandrConfig()
     for profile_name, screens in data["profiles"].items():
         profile = Profile(
-            screen1=screens.get("screen1"),
+            screen1=screens.get("screen1", ""),
             screen2=screens.get("screen2"),
             screen3=screens.get("screen3"),
         )
         config.profiles[profile_name] = profile
     return config
-   
-def parse_xrandr_output(output : str) ->Dict[str, str]:
+
+def parse_xrandr_output(output : str) ->dict[str, str]:
     """return a dict with the EDID as key and the port as value"""
     # Regex to match the port line at the start of a block
     port_regex = re.compile(r'(\S+) connected')
@@ -77,7 +106,7 @@ def parse_xrandr_output(output : str) ->Dict[str, str]:
     # Regex to find the EDID within a block
     edid_regex = re.compile(r'EDID:\s+((?:\t\t[0-9a-fA-F]+\n?)+)', re.MULTILINE)
 
-    results : Dict[str, str] = {}
+    results : dict[str, str] = {}
 
     # Split the output in one block per port (each block starts with an unindented line).
     # Splitting on the lines avoids matching a port name inside another one (DP-1 in eDP-1)
@@ -96,38 +125,42 @@ def parse_xrandr_output(output : str) ->Dict[str, str]:
 
     return results
 
-def get_main_port(output : str) -> Optional[str]:
+def is_laptop(port: str) -> bool:
+    return port.startswith(('eDP', 'LVDS'))
+
+def get_main_port(output : str) -> str | None:
     """return the main screen of the xrandr output : the primary one, else the laptop one, else the first active one"""
     # a port is active when it has a geometry (connected [primary] 1920x1080+0+0)
-    ports = re.findall(r'^(\S+) connected( primary)?( \d+x\d+\+\d+\+\d+)?', output, re.MULTILINE)
-    is_laptop = lambda port: port.startswith(('eDP', 'LVDS'))
-    for condition in (
-        lambda port, primary, active: primary and active,
-        lambda port, primary, active: is_laptop(port) and active,
-        lambda port, primary, active: active,
-        lambda port, primary, active: True,
-    ):
+    ports = [(match.group(1), bool(match.group(2)), bool(match.group(3)))
+             for match in re.finditer(r'^(\S+) connected( primary)?( \d+x\d+\+\d+\+\d+)?', output, re.MULTILINE)]
+    conditions: list[Callable[[str, bool, bool], bool]] = [
+        lambda _port, primary, active: primary and active,
+        lambda port, _primary, active: is_laptop(port) and active,
+        lambda _port, _primary, active: active,
+        lambda _port, _primary, _active: True,
+    ]
+    for condition in conditions:
         for port, primary, active in ports:
             if condition(port, primary, active):
                 return port
     return None
 
-def write_screens_conf(screens_conf_path: str, changes: Dict[str, str]) -> None:
+def write_screens_conf(screens_conf_path: str, changes: dict[str, str]) -> None:
     """write the i3 screen variables, then include the workspace rules using them
     (i3 doesn't share the variables of an included file with the including one)"""
     with open(screens_conf_path, 'w') as file:
-        file.write("# generated by screen_management.py, don't edit\n")
+        _ = file.write("# generated by screen_management.py, don't edit\n")
         for key, value in changes.items():
-            file.write(f'set {key} {value}\n')
+            _ = file.write(f'set {key} {value}\n')
         # absolute path : the file is also included from the sway config
-        file.write(f'include {os.path.join(DIR, "workspaces.conf")}\n')
-        
-def get_sway_ports(descriptions: List[str]) -> List[str]:
+        _ = file.write(f'include {os.path.join(DIR, "workspaces.conf")}\n')
+
+def get_sway_ports(descriptions: list[str]) -> list[str]:
     """the sway names of the screens described by "make model serial" (as in the kanshi profile), "*" being
     any other active screen ; a screen not found (e.g. the laptop when disabled) is replaced by the previous one"""
-    outputs = json.loads(subprocess.run(['swaymsg', '-t', 'get_outputs'], capture_output=True, text=True).stdout)
+    outputs = cast(list[SwayOutput], json.loads(run_output(['swaymsg', '-t', 'get_outputs'])))
     active = {f"{o['make']} {o['model']} {o['serial']}": o['name'] for o in outputs if o['active']}
-    ports: List[str] = []
+    ports: list[str] = []
     for description in descriptions:
         if description == '*':
             others = [name for name in active.values() if name not in ports]
@@ -140,13 +173,13 @@ def get_sway_ports(descriptions: List[str]) -> List[str]:
             ports.append(port)
     return ports
 
-def get_argv_parser():
+def get_argv_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description='Detect and apply the screen configuration with autorandr and xrandr (i3), or the screens of a kanshi profile (sway).')
-    parser.add_argument('-e', '--env', action='store_true', help="write the screens in the screens.conf file included by the i3 config")
-    parser.add_argument('--sway', nargs='+', metavar='DESCRIPTION', help="sway (run by the kanshi profiles) : the screens 1, 2, 3 by their description, then apply their workspaces")
+    _ = parser.add_argument('-e', '--env', action='store_true', help="write the screens in the screens.conf file included by the i3 config")
+    _ = parser.add_argument('--sway', nargs='+', metavar='DESCRIPTION', help="sway (run by the kanshi profiles) : the screens 1, 2, 3 by their description, then apply their workspaces")
     return parser
 
-def sway_main(descriptions: List[str]) -> None:
+def sway_main(descriptions: list[str]) -> None:
     """write ~/.config/sway/screens.conf, then move the open workspaces to their screen.
 
     Sway keeps the first rule of a workspace (a rule sent live doesn't replace the one of the config), so when the
@@ -155,42 +188,44 @@ def sway_main(descriptions: List[str]) -> None:
     screen_ports = get_sway_ports(descriptions)
     if len(screen_ports) == 0:
         print("No screen of the profile found, keep the previous configuration")
-        exit(1)
+        sys.exit(1)
     while len(screen_ports) < 3:
         screen_ports.append(screen_ports[-1])
     changes = {f'$screen_{i + 1}': port for i, port in enumerate(screen_ports[:3])}
     for key, value in changes.items():
         print(f"set {key} {value}")
 
-    previous = open(SWAY_SCREENS_CONF).read() if os.path.exists(SWAY_SCREENS_CONF) else None
+    previous = read_file(SWAY_SCREENS_CONF) if os.path.exists(SWAY_SCREENS_CONF) else None
     write_screens_conf(SWAY_SCREENS_CONF, changes)
-    if open(SWAY_SCREENS_CONF).read() != previous:
+    if read_file(SWAY_SCREENS_CONF) != previous:
         print("new screens : sway reload, then the kanshi profile again")
-        subprocess.run(['swaymsg', 'reload'])
-        subprocess.run(['kanshictl', 'reload'])
+        _ = subprocess.run(['swaymsg', 'reload'], check=False)
+        _ = subprocess.run(['kanshictl', 'reload'], check=False)
         return
-    subprocess.run(['python3', os.path.join(DIR, 'rearrange_workspaces.py')])
+    _ = subprocess.run(['python3', os.path.join(DIR, 'rearrange_workspaces.py')], check=False)
 
 if __name__ == '__main__':
     parser = get_argv_parser()
     args = parser.parse_args()
+    sway = cast(list[str] | None, args.sway)
+    env = cast(bool, args.env)
 
-    if args.sway:
-        sway_main(args.sway)
-        exit(0)
+    if sway:
+        sway_main(sway)
+        sys.exit(0)
 
-    popen = os.popen(f'autorandr --change --default {AUTORANDR_DEFAULT}').read()
+    _ = run_output(['autorandr', '--change', '--default', AUTORANDR_DEFAULT])
     profiles = AutoXrandrOutputs.create_from_autorandr_output()
     with open(SCREEN_CONFIG) as screen_config_file:
-        profile_config = create_from_json(json.load(screen_config_file))
-    xrandr_output_str = os.popen('xrandr --verbose').read()
+        profile_config = create_from_json(cast(ScreenConfigJson, json.load(screen_config_file)))
+    xrandr_output_str = run_output(['xrandr', '--verbose'])
     xrandr_output = parse_xrandr_output(xrandr_output_str)
 
     choosen_profiles = [profile for profile in profiles.profiles if profile.current]
     if len(choosen_profiles) == 0:
         choosen_profiles = [profile for profile in profiles.profiles if profile.detected]
 
-    screen_ports: List[str] = []
+    screen_ports: list[str] = []
     if len(choosen_profiles) == 0:
         print("No autorandr profile detected, using only the main screen")
     elif choosen_profiles[0].name not in profile_config.profiles:
@@ -211,7 +246,7 @@ if __name__ == '__main__':
         screen_ports = [main_port] if main_port else []
     if len(screen_ports) == 0:
         print("No connected screen found, keep the previous configuration")
-        exit(1)
+        sys.exit(1)
 
     # a missing screen is replaced by the previous one
     while len(screen_ports) < 3:
@@ -223,7 +258,7 @@ if __name__ == '__main__':
         '$screen_3': screen_ports[2],
     }
     # Write the i3 variables
-    if args.env:
+    if env:
         write_screens_conf(SCREENS_CONF, changes)
     for key, value in changes.items():
         print(f"set {key} {value}")

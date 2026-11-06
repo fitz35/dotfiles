@@ -4,8 +4,8 @@ import os
 import re
 import shlex
 import subprocess
-from typing import Dict, List
-
+import sys
+from typing import TypedDict, cast
 
 DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -18,13 +18,33 @@ I3_CONFIGS = [os.path.join(DIR, 'config'), os.path.join(DIR, 'common.conf'), SCR
 WM_MSG = 'swaymsg' if os.environ.get('WAYLAND_DISPLAY') else 'i3-msg'
 
 
-def i3_msg(*args: str) -> list:
-    return json.loads(subprocess.run([WM_MSG, *args], capture_output=True, text=True, check=True).stdout)
+class Output(TypedDict):
+    """the fields used from `get_outputs`"""
+    name: str
+    active: bool
 
-def parse_workspace_outputs(config: str) -> Dict[str, List[str]]:
+
+class Workspace(TypedDict):
+    """the fields used from `get_workspaces`"""
+    name: str
+    output: str
+    visible: bool
+    focused: bool
+
+
+def i3_msg(*args: str) -> str:
+    return subprocess.run([WM_MSG, *args], capture_output=True, text=True, check=True).stdout
+
+def get_outputs() -> list[Output]:
+    return cast(list[Output], json.loads(i3_msg('-t', 'get_outputs')))
+
+def get_workspaces() -> list[Workspace]:
+    return cast(list[Workspace], json.loads(i3_msg('-t', 'get_workspaces')))
+
+def parse_workspace_outputs(config: str) -> dict[str, list[str]]:
     """return a dict with the workspace name as key and the assigned outputs (by priority) as value"""
-    variables: Dict[str, str] = {}
-    assignments: Dict[str, List[str]] = {}
+    variables: dict[str, str] = {}
+    assignments: dict[str, list[str]] = {}
     for line in config.splitlines():
         line = line.strip()
         set_match = re.match(r'^set\s+(\$\S+)\s+(.+)$', line)
@@ -41,14 +61,15 @@ def parse_workspace_outputs(config: str) -> Dict[str, List[str]]:
             assignments[words[1]] = words[3:]
     return assignments
 
-def get_argv_parser():
+def get_argv_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description='Move the open workspaces to their assigned screen (from the i3 config).')
-    parser.add_argument('-n', '--dry-run', action='store_true', help="only print the moves")
+    _ = parser.add_argument('-n', '--dry-run', action='store_true', help="only print the moves")
     return parser
 
 if __name__ == '__main__':
     parser = get_argv_parser()
     args = parser.parse_args()
+    dry_run = cast(bool, args.dry_run)
 
     config = ''
     for path in I3_CONFIGS:
@@ -57,19 +78,19 @@ if __name__ == '__main__':
         with open(path) as config_file:
             config += config_file.read() + '\n'
     assignments = parse_workspace_outputs(config)
-    active_outputs = {output['name'] for output in i3_msg('-t', 'get_outputs') if output['active']}
-    workspaces = i3_msg('-t', 'get_workspaces')
+    active_outputs = {output['name'] for output in get_outputs() if output['active']}
+    workspaces = get_workspaces()
 
-    commands: List[str] = []
+    commands: list[str] = []
     for workspace in workspaces:
         outputs = [output for output in assignments.get(workspace['name'], []) if output in active_outputs]
         if outputs and workspace['output'] != outputs[0]:
             print(f"{workspace['name']} : {workspace['output']} -> {outputs[0]}")
             commands.append(f'workspace --no-auto-back-and-forth {json.dumps(workspace["name"], ensure_ascii=False)}; '
-                            f'move workspace to output {outputs[0]}')
+                            + f'move workspace to output {outputs[0]}')
 
-    if args.dry_run or not commands:
-        exit(0)
+    if dry_run or not commands:
+        sys.exit(0)
 
     # restore the visible workspaces, then the focused one (moving a workspace focuses it)
     visible = [workspace['name'] for workspace in workspaces if workspace['visible'] and not workspace['focused']]
@@ -77,4 +98,4 @@ if __name__ == '__main__':
     for name in visible + focused:
         commands.append(f'workspace --no-auto-back-and-forth {json.dumps(name, ensure_ascii=False)}')
 
-    i3_msg('; '.join(commands))
+    _ = i3_msg('; '.join(commands))
