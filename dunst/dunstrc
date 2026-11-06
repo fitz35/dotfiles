@@ -40,3 +40,12 @@
     foreground = "#adbac7"
     frame_color = "#d7005f"
     timeout = 0
+
+# flameshot warns at each grim capture that grim is wlroots-only (true, and sway is wlroots) : the popup
+# would sit over the capture overlay and land in the screenshot, so it is dropped (popup and history)
+[flameshot_grim_warning]
+    appname = flameshot
+    summary = "Flameshot Warning"
+    body = "*wlroots*"
+    skip_display = true
+    history_ignore = true
