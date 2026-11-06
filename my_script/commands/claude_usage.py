@@ -90,15 +90,21 @@ def load_limits():
 
 def real_usage():
     """The real % of /usage (undocumented oauth endpoint, same as the VS Code extension), cached 60 s so the bar
-    doesn't hammer it. None if offline / token expired / endpoint changed : the caller falls back to the estimate."""
+    doesn't hammer it. On a failure (offline, token being refreshed, rate limit) the last good value is kept until
+    its reset time : the log-based estimate is far off (124 % seen), so it is only the fallback when there is nothing
+    else. None if there is no usable value : the caller falls back to the estimate."""
     cache = os.path.expanduser("~/.cache/my_script/claude_real_usage.json")
+    retry = cache + ".retry"  # touched on a failure : no retry every second
+    last = None
     try:
-        if time.time() - os.path.getmtime(cache) < 60:
-            with open(cache) as f:
-                return json.load(f) or None
+        with open(cache) as f:
+            last = json.load(f) or None
+        if last and time.time() - os.path.getmtime(cache) < 60:
+            return last
+        if time.time() - os.path.getmtime(retry) < 120 and os.path.getmtime(retry) > os.path.getmtime(cache):
+            return still_valid(last)
     except (OSError, ValueError):
         pass
-    data = None
     try:
         with open(os.path.expanduser("~/.claude/.credentials.json")) as f:
             token = json.load(f)["claudeAiOauth"]["accessToken"]
@@ -107,12 +113,28 @@ def real_usage():
         with urllib.request.urlopen(request, timeout=5) as response:
             raw = json.load(response)
         data = {k: {"pct": raw[k]["utilization"], "reset": raw[k]["resets_at"]} for k in ("five_hour", "seven_day")}
+        os.makedirs(os.path.dirname(cache), exist_ok=True)
+        with open(cache, "w") as f:
+            json.dump(data, f)
+        return data
     except (OSError, ValueError, KeyError, TypeError):
+        os.makedirs(os.path.dirname(cache), exist_ok=True)
+        with open(retry, "w"):
+            pass
+        return still_valid(last)
+
+
+def still_valid(last):
+    """The last good value, unless a window already reset since (its % would be wrong then)."""
+    if not last:
+        return None
+    now = datetime.now().astimezone()
+    try:
+        if all(datetime.fromisoformat(last[k]["reset"]) > now for k in ("five_hour", "seven_day")):
+            return last
+    except (KeyError, ValueError, TypeError):
         pass
-    os.makedirs(os.path.dirname(cache), exist_ok=True)  # a failure is cached too (empty) : no retry every second
-    with open(cache, "w") as f:
-        json.dump(data or {}, f)
-    return data
+    return None
 
 
 def reset_in(iso):
@@ -148,7 +170,8 @@ def waybar_real(real):
 
 
 def percent(used, key, limits):
-    return f"{used / limits[key] * 100:.0f}%" if limits.get(key) else "?%"
+    """Estimate, shown with a "~" and capped at 100 (the uncalibrated limits made 124 % appear)."""
+    return f"~{min(used / limits[key] * 100, 100):.0f}%" if limits.get(key) else "?%"
 
 
 def calibrate(pct_block, pct_week):
