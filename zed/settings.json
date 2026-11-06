@@ -62,7 +62,12 @@
     "VSCode Dark Modern": {
       "border": "#454545",
       "pane_group.border": "#454545",
-      "pane.focused_border": "#0078D4"
+      "pane.focused_border": "#0078D4",
+      // agent panel code : Zed paints code blocks and inline code with the text color at 8 % opacity (not a theme key),
+      // so the background can't be set directly ; a visible outline (border.variant) and a darker panel behind
+      // raise the contrast instead
+      "border.variant": "#6A6A6A",
+      "panel.background": "#101010"
     }
   },
   "active_pane_modifiers": {
