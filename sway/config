@@ -80,5 +80,6 @@ for_window [app_id="code" title=".*dotfiles - Visual Studio Code"] move containe
 # so a zed window moved by hand stays where it is
 for_window [app_id="dev.zed.Zed"] move container to workspace $ws3
 for_window [app_id="dev.zed.Zed" title="^dotfiles( — .*)?$"] move container to workspace $ws9
-# flameshot : its capture overlay floats over the whole screen
-for_window [app_id="flameshot"] floating enable, fullscreen enable global
+# flameshot : its capture overlay floats over all the screens (global : the grim image spans every output,
+# fullscreen on one output only shows its top-left corner there) ; flameshot 13 sets no app_id, only the title
+for_window [title="^flameshot$"] floating enable, fullscreen enable global
