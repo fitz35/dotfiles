@@ -13,7 +13,8 @@ import argparse
 import os
 import subprocess
 import sys
-from typing import Dict, List
+from collections.abc import Callable
+from typing import cast
 
 # the subfolders of these folders are listed
 PARENT_FOLDERS = ["~/Documents/github/"]
@@ -21,9 +22,9 @@ PARENT_FOLDERS = ["~/Documents/github/"]
 HAND_PICKED_FOLDERS = ["~/Documents/github/perso-divers/document/"]
 
 
-def list_folders() -> Dict[str, str]:
+def list_folders() -> dict[str, str]:
     """{name shown in the menu: path}, most recently modified first (the subfolders, then the hand picked ones)"""
-    folders: Dict[str, str] = {}
+    folders: dict[str, str] = {}
     for parent in map(os.path.expanduser, PARENT_FOLDERS):
         subfolders = [name for name in os.listdir(parent) if os.path.isdir(os.path.join(parent, name))]
         for name in sorted(subfolders, key=lambda name: os.path.getmtime(os.path.join(parent, name)), reverse=True):
@@ -33,21 +34,21 @@ def list_folders() -> Dict[str, str]:
     return folders
 
 
-def open_editor(editor: List[str], directory: str) -> None:
+def open_editor(editor: list[str], directory: str) -> None:
     """the editor (command and options) in the directory, inside its `nix develop` shell when it has a flake.nix"""
     os.chdir(directory)
     if os.path.exists("flake.nix"):
-        if subprocess.run(["nix", "develop", "--command", *editor, "."]).returncode == 0:
+        if subprocess.run(["nix", "develop", "--command", *editor, "."], check=False).returncode == 0:
             return
         print(f"nix develop failed, opening {editor[0]} without it")
-    subprocess.run([*editor, "."])
+    _ = subprocess.run([*editor, "."], check=False)
 
 
 def open_terminal(directory: str) -> None:
-    subprocess.Popen(["kitty", "--directory", directory])
+    _ = subprocess.Popen(["kitty", "--directory", directory])
 
 
-ACTIONS = {
+ACTIONS: dict[str, Callable[[str], None]] = {
     # -n : a new window, even if the folder is already open in one
     "zed": lambda directory: open_editor(["zeditor", "-n"], directory),
     "code": lambda directory: open_editor(["code"], directory),
@@ -63,16 +64,16 @@ PROMPTS = {
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Open a project folder chosen in rofi.")
-    parser.add_argument("action", choices=ACTIONS, help="open it in a new zed window, vscode or a terminal")
-    args = parser.parse_args()
+    _ = parser.add_argument("action", choices=ACTIONS, help="open it in a new zed window, vscode or a terminal")
+    action = cast(str, parser.parse_args().action)
 
     folders = list_folders()
     # the names are given through stdin, so the special characters don't break the command
-    choice = subprocess.run([os.environ["MY_SCRIPT"], "rofi", "-dmenu", "-p", PROMPTS[args.action]],
-                            input="\n".join(folders), text=True, capture_output=True).stdout.strip()
+    choice = subprocess.run([os.environ["MY_SCRIPT"], "rofi", "-dmenu", "-p", PROMPTS[action]],
+                            input="\n".join(folders), text=True, capture_output=True, check=False).stdout.strip()
     if choice not in folders:
         sys.exit(1)  # nothing chosen
-    ACTIONS[args.action](folders[choice])
+    ACTIONS[action](folders[choice])
 
 
 if __name__ == "__main__":

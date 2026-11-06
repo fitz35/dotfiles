@@ -13,20 +13,20 @@ import argparse
 import os
 import subprocess
 from datetime import datetime
-from typing import List, Tuple
+from typing import cast
 
 UPTIME_FILE = os.path.expanduser("~/daily_uptime.txt")
 DATE_FORMAT = "%Y-%m-%d %H:%M:%S"
 
 
-def read_lines() -> List[str]:
+def read_lines() -> list[str]:
     if not os.path.exists(UPTIME_FILE):
         return []
     with open(UPTIME_FILE) as file:
         return [line.strip() for line in file if line.strip()]
 
 
-def parse_line(line: str) -> Tuple[datetime, int]:
+def parse_line(line: str) -> tuple[datetime, int]:
     """("2026-11-03 14:53:19 -  0:49") → (date of the last update, uptime in minutes)"""
     date, uptime = line.split(" - ")
     hours, minutes = map(int, uptime.split(":"))
@@ -39,7 +39,7 @@ def current_uptime_minutes() -> int:
         return int(float(file.read().split()[0])) // 60
 
 
-def record(now: datetime, lines: List[str]) -> List[str]:
+def record(now: datetime, lines: list[str]) -> list[str]:
     """the lines with the uptime of this boot : its line is updated, or added if the last line is an older boot"""
     minutes = current_uptime_minutes()
     if minutes == 0:  # avoid the 0 min lines
@@ -56,22 +56,22 @@ def record(now: datetime, lines: List[str]) -> List[str]:
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Daily uptime, saved in ~/daily_uptime.txt.")
-    parser.add_argument("-display_entry", action="store_true", help="show today's lines in rofi")
-    args = parser.parse_args()
+    _ = parser.add_argument("-display_entry", action="store_true", help="show today's lines in rofi")
+    display_entry = cast(bool, parser.parse_args().display_entry)
 
     now = datetime.now()
     lines = read_lines()
     todays_lines = [line for line in lines if parse_line(line)[0].date() == now.date()]
 
-    if args.display_entry:
+    if display_entry:
         menu = "\n".join(reversed(todays_lines))  # the most recent first
-        subprocess.run([os.environ["MY_SCRIPT"], "rofi", "-dmenu", "-p", "Today's Uptimes"], input=menu, text=True)
+        _ = subprocess.run([os.environ["MY_SCRIPT"], "rofi", "-dmenu", "-p", "Today's Uptimes"], input=menu, text=True, check=False)
         return
 
     new_lines = record(now, lines)
     if new_lines != lines:
         with open(UPTIME_FILE, "w") as file:
-            file.write("\n".join(new_lines) + "\n")
+            _ = file.write("\n".join(new_lines) + "\n")
 
     today = sum(parse_line(line)[1] for line in new_lines if parse_line(line)[0].date() == now.date())
     hours, minutes = divmod(today, 60)
