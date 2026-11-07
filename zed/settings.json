@@ -104,6 +104,14 @@
   // of Zed's tree-sitter colors (off by default in Zed : tree-sitter alone can't tell a crate from a variable)
   "semantic_tokens": "combined",
 
+  // rust-analyzer's format placeholders ({} in println!) : Zed paints them in string.special (red on the
+  // orange string, hard to read) ; the VS Code blue instead
+  "global_lsp_settings": {
+    "semantic_token_rules": [
+      { "token_type": "formatSpecifier", "foreground_color": "#569CD6" }
+    ]
+  },
+
   // inlay hints (types, argument names) everywhere, as in VS Code (off by default in Zed)
   "inlay_hints": {
     "enabled": true
