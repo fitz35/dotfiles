@@ -105,10 +105,16 @@
   "semantic_tokens": "combined",
 
   // rust-analyzer's format placeholders ({} in println!) : Zed paints them in string.special (red on the
-  // orange string, hard to read) ; the VS Code blue instead
+  // orange string, hard to read) ; the VS Code blue instead.
+  // attributes and derives (derive, FromRow in #[derive(sqlx::FromRow)]) : Zed paints them in the theme's
+  // attribute color (the variable light blue) ; VS Code has no color for them and falls back to the function yellow
   "global_lsp_settings": {
     "semantic_token_rules": [
-      { "token_type": "formatSpecifier", "foreground_color": "#569CD6" }
+      { "token_type": "formatSpecifier", "foreground_color": "#569CD6" },
+      { "token_type": "attribute", "foreground_color": "#DCDCAA" },
+      { "token_type": "builtinAttribute", "foreground_color": "#DCDCAA" },
+      { "token_type": "derive", "foreground_color": "#DCDCAA" },
+      { "token_type": "deriveHelper", "foreground_color": "#DCDCAA" }
     ]
   },
 
