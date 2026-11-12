@@ -14,11 +14,16 @@ done
 INTERVAL=240 # seconds
 
 while true; do
-    if is_wayland; then
-        images=("$HOME"/.config/assets/background_image/*)
-        swaymsg output '*' bg "${images[RANDOM % ${#images[@]}]}" fill > /dev/null
-    else
-        feh --bg-fill --randomize "$HOME"/.config/assets/background_image/*
+    # the files of the subfolders too (private/ : the git-ignored images, kept out of the public repo) ; -L : the
+    # assets folder is a link into the dotfiles
+    mapfile -t images < <(find -L "$HOME/.config/assets/background_image" -type f)
+    if [ "${#images[@]}" -gt 0 ]; then
+        image="${images[RANDOM % ${#images[@]}]}"
+        if is_wayland; then
+            swaymsg output '*' bg "$image" fill > /dev/null
+        else
+            feh --bg-fill "$image"
+        fi
     fi
     sleep "$INTERVAL"
 done

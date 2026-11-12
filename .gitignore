@@ -4,3 +4,5 @@ i3/screens.conf
 result
 sway/screens.conf
 __pycache__/
+# my own wallpapers, not published
+assets/background_image/private/
