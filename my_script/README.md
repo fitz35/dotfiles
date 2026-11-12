@@ -16,7 +16,7 @@ my_script <command> [arguments]
 | `clipboard` | i3 / sway `$mod+v` | clipboard history (greenclip in i3, cliphist in sway), paste the chosen entry |
 | `logout_menu` | i3 `$mod+Escape`, power button, polybar | lock / logout / reboot / shutdown |
 | `lock` | xss-lock / swayidle, `logout_menu` | lock screen (i3lock-color in i3, swaylock-effects in sway) |
-| `wallpaper` | i3 / sway at login | random wallpaper of the dotfiles assets, every `INTERVAL` seconds (feh in i3, the sway background in sway) |
+| `wallpaper` | i3 / sway at login | one random wallpaper per workspace from the dotfiles assets (kept for the session, renewed every `INTERVAL` seconds), swapped on the workspace events (feh in i3, the sway background in sway) |
 | `claude_usage [report]` | waybar, zed task | Claude Code tokens of the current 5 h block (estimate from `~/.claude/projects`) ; `report` : the last 7 days per model |
 | `clean` | waybar disk alert (click), zed task | free the / partition, asking before each step : old generations, idle direnv shells, nix gc, docker, journal |
 | `rofi <arguments>` | i3 `$mod+d`, the menus | rofi with a random theme of `rofi/themes/` ([themes](https://github.com/newmanls/rofi-themes-collection)) |
