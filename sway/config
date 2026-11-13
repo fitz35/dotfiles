@@ -65,8 +65,10 @@ bindsym $mod+Shift+e exec swaynag -t warning -m 'Exit sway ? This will end your 
 # to identify the app_id of a window : swaymsg -t get_tree | grep app_id
 assign [app_id="thunderbird"] $ws1
 # the dialogs of thunderbird (calendar reminders, password prompts at startup) : tiled (resized), their buttons
-# don't react to the clicks ; brought back from the workspace 1 (assign above) to the screen where I am
-for_window [app_id="thunderbird" title="(?i)(reminder|password)"] floating enable, move container to output current, focus
+# don't react to the clicks ; brought back from the workspace 1 (assign above) to the screen where I am.
+# The reminder opens taller than the screen (buttons off-screen) : fixed size, centered
+for_window [app_id="thunderbird" title="(?i)reminder"] floating enable, resize set 700 500, move position center, move container to output current, focus
+for_window [app_id="thunderbird" title="(?i)password"] floating enable, move container to output current, focus
 assign [app_id="firefox"] $ws2
 assign [app_id="md.obsidian.Obsidian"] $ws4
 assign [app_id="discord"] $ws5
