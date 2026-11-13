@@ -7,10 +7,10 @@
   "agent_servers": {
     "claude-acp": {
       "default_config_options": {
-        "model": "sonnet",
+        "model": "opus",
         "fast": false,
         "effort": "medium",
-        "mode": "auto"
+        "mode": "plan"
       },
       "type": "registry"
     }
@@ -111,6 +111,7 @@
   "global_lsp_settings": {
     "semantic_token_rules": [
       { "token_type": "formatSpecifier", "foreground_color": "#569CD6" },
+      { "token_type": "decorator", "foreground_color": "#DCDCAA" },
       { "token_type": "attribute", "foreground_color": "#DCDCAA" },
       { "token_type": "builtinAttribute", "foreground_color": "#DCDCAA" },
       { "token_type": "derive", "foreground_color": "#DCDCAA" },
