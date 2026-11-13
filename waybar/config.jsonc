@@ -39,9 +39,10 @@
     "battery": {
         "states": { "warning": 30, "critical": 20 },
         "format": "{icon} {capacity}%",
-        "format-charging": " {capacity}%",
-        "format-plugged": " {capacity}%",
-        "format-icons": ["", "", "", "", ""]
+        "format-charging": "\uf0e7 {icon} {capacity}%",
+        "format-plugged": "\uf1e6 {icon} {capacity}%",
+        "format-icons": ["\uf244", "\uf243", "\uf242", "\uf241", "\uf240"],
+        "tooltip-format": "{timeTo} ({power} W)"
     },
     "network": {
         "format-wifi": " {essid}",

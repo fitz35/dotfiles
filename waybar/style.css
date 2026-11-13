@@ -7,6 +7,7 @@
 @define-color secondary #f0b746;
 @define-color alert #d7005f;
 @define-color disabled #707880;
+@define-color charging #98c379;
 
 * {
     font-family: "JetBrainsMono Nerd Font";
@@ -128,6 +129,12 @@ window#waybar {
 #temperature.critical,
 #disk.critical {
     color: @alert;
+}
+
+/* charging : green even when low, so the plug is obvious (after .critical so it wins) */
+#battery.charging,
+#battery.plugged {
+    color: @charging;
 }
 
 /* the / partition nearly full (disk#alert, hidden below 80 %) */
