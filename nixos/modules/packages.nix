@@ -4,9 +4,23 @@
 { config, lib, pkgs, myConf, ... }:
 
 {
+  # prefs apply to every profile (default and work)
+  programs.firefox = {
+    enable = true;
+    preferencesStatus = "default"; # defaults, still editable in about:config
+    preferences = {
+      # reopen the tabs at each start (power-off kills firefox : the session is never closed cleanly)
+      "browser.startup.page" = 3;
+      # restore after an unclean exit without the "Restore session" page (by default it shows up
+      # once more than 1 crash is counted)
+      "browser.sessionstore.max_resumed_crashes" = 999;
+      # the repeated unclean exits must not trigger the safe mode prompt
+      "toolkit.startup.max_resumed_crashes" = -1;
+    };
+  };
+
   users.users.${myConf.USER_NAME}.packages = with pkgs; [
     # web and mail
-    firefox
     chromium
     thunderbird
 
