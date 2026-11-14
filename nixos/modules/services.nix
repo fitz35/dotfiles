@@ -11,6 +11,7 @@
     dates = "weekly";
     options = "--delete-older-than 14d"; # keep 2 weeks of generations to rollback
   };
+  services.journald.extraConfig = "SystemMaxUse=200M"; # the journal can't grow forever
   nix.settings.auto-optimise-store = true; # hard link identical files in the store
   # https://github.com/Mic92/nix-ld : run the binaries not built for nixos (vscode servers, pip wheels...)
   programs.nix-ld.enable = true;
@@ -60,6 +61,12 @@
   # stop the containers with the daemon (default true : they are left running for a docker upgrade, then killed
   # at the end of the shutdown, slow and unclean for postgres, "Exited (255)")
   virtualisation.docker.liveRestore = false;
+  # weekly : unused images (not only the dangling ones) and build cache, like the nix garbage collection
+  virtualisation.docker.autoPrune = {
+    enable = true;
+    dates = "weekly";
+    flags = [ "--all" ];
+  };
   # direnv and .envrc (https://github.com/nix-community/nix-direnv), also adds the direnv hook to bash
   programs.direnv.enable = true;
 }
