@@ -69,7 +69,9 @@ assign [app_id="thunderbird"] $ws1
 # The reminder opens taller than the screen (buttons off-screen) : fixed size, centered
 for_window [app_id="thunderbird" title="(?i)reminder"] floating enable, resize set 700 500, move position center, move container to output current, focus
 for_window [app_id="thunderbird" title="(?i)password"] floating enable, move container to output current, focus
-assign [app_id="firefox"] $ws2
+# criteria are regexes : anchored so that firefox does not also match firefox-work
+assign [app_id="^firefox$"] $ws2
+assign [app_id="^firefox-work$"] $ws7
 assign [app_id="md.obsidian.Obsidian"] $ws4
 assign [app_id="discord"] $ws5
 assign [app_id="spotify"] $ws11
