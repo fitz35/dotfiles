@@ -1,11 +1,18 @@
 #!/usr/bin/env bash
 # Frees the / partition (the nix store is on it), asking before each step.
-# Usage : my_script clean   (opened in a terminal by a click on the waybar disk alert)
+# Usage : my_script clean [-y]   (opened in a terminal by a click on the waybar disk alert)
+#   -y : answer yes to every step, no question and no pause at the end (for a cron / systemd timer ; the sudo
+#   steps then need root or a sudo without password). Weekly automatic cleaning of nix, docker and the journal
+#   is already done by nixos/modules/services.nix : this script is for the deeper manual clean.
 # Steps : old system and user generations (the last 3 kept), the direnv shells of the projects untouched for
 # 30 days (rebuilt at the next cd), nix garbage collection, docker unused images and build cache, the journal,
 # then the boot menu is regenerated without the deleted generations.
 
+auto=false
+[ "${1:-}" = "-y" ] || [ "${1:-}" = "--yes" ] && auto=true
+
 ask() {
+    $auto && return 0
     read -r -p "$1 [y/N] " answer
     [ "$answer" = "y" ] || [ "$answer" = "Y" ]
 }
@@ -53,4 +60,4 @@ fi
 
 echo
 echo "After : $(usage)"
-read -r -p "Press Enter to close"
+$auto || read -r -p "Press Enter to close"
