@@ -3,14 +3,16 @@
 Started by i3 / sway (exec_always : a sway reload clears the background, the restart sets one at once) and runs
 until the session ends. Neither sway nor i3 has a per-workspace background : this listens to the workspace
 events and swaps the image of a screen when the workspace shown on it changes. Idle cost : none (it blocks on
-the IPC events, no polling) ; per switch : one image decode by swaybg / feh.
-X (i3) : feh, Wayland (sway) : the sway background.
+the IPC events, no polling) ; per switch : one IPC request to awww-daemon, which keeps the decoded images
+(`swaymsg output bg` would reconfigure the output and respawn swaybg, decoding the PNG again : a visible lag).
+X (i3) : feh, Wayland (sway) : awww, or the sway background when awww is not installed.
 """
 
 import json
 import os
 import random
 import select
+import shutil
 import signal
 import subprocess
 import sys
@@ -71,11 +73,31 @@ def x_screen_order() -> list[str]:
     return [line.split()[-1] for line in result.stdout.splitlines()[1:] if line.strip()]
 
 
+def start_awww() -> bool:
+    """Make sure awww-daemon runs ; False when awww is missing or does not answer (use the sway background)."""
+    if shutil.which("awww") is None or shutil.which("awww-daemon") is None:
+        return False
+    if subprocess.run(["pgrep", "-f", "awww-daemon"], capture_output=True, check=False).returncode != 0:
+        _ = subprocess.Popen(
+            ["awww-daemon"],
+            stdin=subprocess.DEVNULL,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+            start_new_session=True,  # outlives this loop : its cache is the point
+        )
+    for _attempt in range(20):
+        if subprocess.run(["awww", "query"], capture_output=True, check=False).returncode == 0:
+            return True
+        time.sleep(0.05)
+    return False
+
+
 class Wallpapers:
     def __init__(self) -> None:
         self.images: list[str] = list_images()
         self.ws_image: dict[str, str] = {}  # workspace -> its image, kept for the session
         self.shown: dict[str, str] = {}  # output -> image drawn on it now (no redraw when unchanged)
+        self.awww: bool = WAYLAND and start_awww()
 
     def pick(self, taken: set[str]) -> str:
         # not an image already on another screen, when there are enough of them
@@ -94,7 +116,12 @@ class Wallpapers:
         if WAYLAND:
             for output, image in wanted.items():
                 if self.shown.get(output) != image:
-                    _ = subprocess.run([WM_MSG, "output", output, "bg", image, "fill"], capture_output=True, check=False)
+                    if self.awww:
+                        # crop = sway's fill
+                        cmd = ["awww", "img", "-o", output, "--resize", "crop", "--transition-type", "none", image]
+                    else:
+                        cmd = [WM_MSG, "output", output, "bg", image, "fill"]
+                    _ = subprocess.run(cmd, capture_output=True, check=False)
         elif wanted != self.shown:
             # feh sets every screen at once, the n-th image on the n-th screen
             order = x_screen_order()
