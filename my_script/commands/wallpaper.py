@@ -77,7 +77,8 @@ def start_awww() -> bool:
     """Make sure awww-daemon runs ; False when awww is missing or does not answer (use the sway background)."""
     if shutil.which("awww") is None or shutil.which("awww-daemon") is None:
         return False
-    if subprocess.run(["pgrep", "-f", "awww-daemon"], capture_output=True, check=False).returncode != 0:
+    # asking the daemon rather than pgrep -f : that one matches any command line mentioning the name
+    if subprocess.run(["awww", "query"], capture_output=True, check=False).returncode != 0:
         _ = subprocess.Popen(
             ["awww-daemon"],
             stdin=subprocess.DEVNULL,
@@ -85,7 +86,7 @@ def start_awww() -> bool:
             stderr=subprocess.DEVNULL,
             start_new_session=True,  # outlives this loop : its cache is the point
         )
-    for _attempt in range(20):
+    for _attempt in range(40):
         if subprocess.run(["awww", "query"], capture_output=True, check=False).returncode == 0:
             return True
         time.sleep(0.05)
