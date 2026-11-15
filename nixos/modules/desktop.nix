@@ -91,6 +91,7 @@ in
       kanshi # screen profiles
       swayidle # lock after 2 min (my_script lock)
       grim slurp # screenshots
+      awww # wallpaper daemon : keeps the decoded images, a switch is one request (my_script wallpaper)
       wl-clipboard cliphist # clipboard history (wl-paste --watch cliphist store in sway/config)
     ];
   };
