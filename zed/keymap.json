@@ -15,5 +15,13 @@
     "bindings": {
       "ctrl-n": ["agent::NewExternalAgentThread", { "agent": "claude-acp" }]
     }
+  },
+  {
+    // Git Graph (commit graph like VS Code's) : no default key and no way to add a custom button, so a key next
+    // to Zed's own "alt-g" git prefix (alt-g b blame, alt-g m modified files, alt-g r review diff)
+    "context": "Workspace",
+    "bindings": {
+      "alt-g g": "git_graph::Open"
+    }
   }
 ]
